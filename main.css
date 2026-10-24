@@ -1,0 +1,106 @@
+/* 基础重置 */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: #111; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; user-select: none; }
+#phone { position: relative; width: 100%; height: 100%; background: #000; overflow: hidden; margin: 0 auto; }
+@media (min-width: 500px) { body { display: flex; align-items: center; justify-content: center; background: #111; } #phone { width: 390px; height: 844px; border-radius: 55px; box-shadow: 0 0 0 12px #000, 0 0 0 14px #333, 0 20px 40px rgba(0,0,0,0.5); border: 4px solid #000; } }
+.notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 120px; height: 34px; background: #000; border-radius: 20px; z-index: 10000; }
+@media (max-width: 500px) { .notch { display: none; } }
+
+/* 壁纸与锁屏 */
+.wallpaper { position: absolute; inset: 0; background-size: cover; background-position: center; background-image: linear-gradient(180deg, #1a1a1a 0%, #333 100%); z-index: 0; }
+.wallpaper::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.4)); }
+.battery-icon { display: inline-flex; align-items: center; gap: 2px; }
+.battery-body { width: 24px; height: 12px; border: 1.5px solid #fff; border-radius: 3.5px; padding: 1px; }
+.battery-level { width: 85%; height: 100%; background: #fff; border-radius: 1.5px; }
+.battery-tip { width: 2px; height: 4px; background: #fff; border-radius: 0 1px 1px 0; opacity: 0.8; }
+#lock { position: absolute; inset: 0; z-index: 9999; display: flex; flex-direction: column; transition: transform 0.4s, opacity 0.4s; background: #000; }
+#lock.unlocked { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+#lock-bg { position: absolute; inset: 0; background-size: cover; background-position: center; background-image: url('wallpaper.jpg'); }
+#lock-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.2) 80%); }
+#lock-main { position: absolute; inset: 0; display: flex; flex-direction: column; transition: opacity 0.3s, transform 0.3s; }
+#lock-main.passcode-active { opacity: 0; transform: scale(0.95); pointer-events: none; }
+.lock-status { display: flex; justify-content: flex-end; align-items: center; padding: 16px 24px 0; }
+.lock-header { margin-top: 40px; text-align: center; }
+.lock-date { font-size: 20px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.lock-time { font-size: 96px; font-weight: 700; letter-spacing: -2px; color: transparent; -webkit-text-stroke: 2.5px rgba(255,255,255,0.75); margin-top: -5px; }
+.lock-footer { margin-top: auto; padding: 0 40px 50px; display: flex; justify-content: space-between; }
+.lock-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.lock-homebar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff; }
+#lock-banner { position: absolute; top: 35%; left: 16px; right: 16px; background: rgba(50,50,50,0.6); backdrop-filter: blur(25px); border-radius: 20px; padding: 14px 16px; display: flex; gap: 12px; transform: scale(0.9); opacity: 0; transition: all 0.4s; z-index: 10000; border: 1px solid rgba(255,255,255,0.1); }
+#lock-banner.show { transform: scale(1); opacity: 1; }
+#lock-banner img { width: 42px; height: 42px; border-radius: 8px; object-fit: cover; }
+#lock-banner .b-title { font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; }
+#lock-banner .b-desc { font-size: 14px; color: #eee; margin-top: 4px; }
+#passcode-screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 100px 0 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(20px); background: rgba(0,0,0,0.6); }
+#passcode-screen.active { opacity: 1; pointer-events: auto; }
+#passcode-screen .p-title { text-align: center; margin-bottom: 20px; }
+#passcode-screen .dots { display: flex; justify-content: center; gap: 16px; }
+#passcode-screen .dots span { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #fff; }
+#passcode-screen .dots span.filled { background: #fff; }
+#passcode-screen .error { color: #ff3b30; font-size: 14px; margin-top: 10px; opacity: 0; text-align: center; }
+#passcode-screen .error.show { opacity: 1; }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 25px; margin-bottom: 30px; }
+.key { width: 75px; height: 75px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; }
+.key:active { background: rgba(255,255,255,0.4); }
+.key.empty { background: transparent; pointer-events: none; }
+.key.del { background: transparent; font-size: 22px; }
+
+/* 桌面 */
+#home { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; padding: 0 18px; }
+.statusbar { height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; font-size: 15px; font-weight: 600; padding-top: 4px; }
+.widgets { display: flex; gap: 14px; margin-bottom: 24px; margin-top: 6px; }
+.widget { flex: 1; border-radius: 20px; padding: 12px 14px; background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); min-height: 90px; display: flex; flex-direction: column; justify-content: space-between; }
+.widget .w-title { font-size: 12px; display: flex; justify-content: space-between; }
+.widget .w-big { font-size: 24px; }
+.widget .w-sub { font-size: 12px; opacity: 0.8; }
+.widget .ev { font-size: 12px; margin-top: 3px; display: flex; gap: 6px; }
+.apps { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px 10px; align-content: start; }
+.app { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: transform 0.1s; }
+.app:active { transform: scale(0.85); }
+.app .ico { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.app .nm { font-size: 11px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 72px; }
+.page-dots { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
+.page-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+.page-dots i.on { background: #fff; }
+.search-pill { display: flex; justify-content: center; margin-bottom: 25px; }
+.search-pill div { background: rgba(255,255,255,0.2); padding: 5px 14px; border-radius: 20px; font-size: 13px; }
+.dock { position: absolute; left: 14px; right: 14px; bottom: 26px; height: 88px; border-radius: 32px; background: rgba(255,255,255,0.15); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-around; padding: 0 10px; }
+.homebar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff; z-index: 50; }
+
+/* App 容器 */
+.app-page { position: absolute; inset: 0; background: #fff; color: #000; z-index: 200; display: none; flex-direction: column; }
+.app-page.active { display: flex; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes slideIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.app-page.dark { background: #000; color: #fff; }
+
+/* 纯 CSS 图标 */
+.ico-cal { background: #fff; color: #000; flex-direction: column; font-weight: 400; }
+.ico-cal .c-top { color: #ff3b30; font-size: 11px; margin-top: 4px; font-weight: 600; }
+.ico-cal .c-num { font-size: 32px; font-weight: 300; line-height: 1; margin-top: -2px; }
+.ico-weather { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); position: relative; }
+.ico-weather .cloud { width: 30px; height: 14px; background: #fff; border-radius: 10px; position: absolute; bottom: 14px; }
+.ico-weather .cloud::before { content: ''; position: absolute; width: 16px; height: 16px; background: #fff; border-radius: 50%; top: -8px; left: 4px; }
+.ico-weather .sun { position: absolute; width: 14px; height: 14px; background: #ffcc00; border-radius: 50%; top: 12px; right: 12px; }
+.ico-clock { background: #fff; color: #000; }
+.ico-clock .face { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #000; position: relative; display:flex; align-items:center; justify-content:center;}
+.ico-clock .h1 { width: 2px; height: 16px; background: #000; position: absolute; left: 50%; bottom: 50%; transform: translateX(-50%) rotate(45deg); transform-origin: bottom; }
+.ico-x { background: #000; color: #fff; font-size: 34px; font-family: sans-serif; }
+.ico-notes { background: #ffd60a; }
+.ico-mail { background: #007aff; }
+.ico-mail svg { width: 38px; height: 38px; fill: #fff; }
+.ico-settings { background: #8e8e93; }
+.ico-settings svg { width: 36px; height: 36px; fill: #fff; }
+.ico-phone { background: #34c759; }
+.ico-phone svg { width: 38px; height: 38px; fill: #fff; }
+.ico-safari { background: #fff; font-size: 38px; color: #007aff; }
+.ico-msg { background: #34c759; }
+.ico-msg svg { width: 38px; height: 38px; fill: #fff; }
+.ico-music { background: #ff3b30; }
+.ico-music svg { width: 36px; height: 36px; fill: #fff; }
+/* ================= X (推特) 专属样式 ================= */
+#xAppContent { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.x-tab { display: none; flex-direction: column; height: 100%; background: #000; color: #fff; padding-bottom: 60px; overflow-y: auto;}
+.x-tab.active { display: flex; }
+.x-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 54px; background: #000; border-top: 1px solid #2f3336; display: flex; justify-content: space-around; align-items: center; z-index: 500; padding-bottom: 6px; }
+.x-nav svg { width: 26px; height: 26px; fill: #71767b; cursor: pointer; transition: fill 0.2s;}
+.x-nav svg.active { fill: #fff; }

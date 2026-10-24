@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>iOS Phone</title>
+<link rel="stylesheet" href="main.css">
+</head>
+<body>
+<div id="phone">
+  <div class="notch"></div>
+  <div class="wallpaper" id="wallpaper"></div>
+
+  <!-- 桌面 -->
+  <div id="home">
+    <div class="statusbar">
+      <span id="homeClock">00:00</span>
+      <span class="battery-icon"><div class="battery-body"><div class="battery-level"></div></div><div class="battery-tip"></div></span>
+    </div>
+    <div class="widgets">
+      <div class="widget" id="wWeather"></div>
+      <div class="widget" id="wEvents"></div>
+    </div>
+    <div class="apps" id="apps"></div>
+    <div class="page-dots"><i class="on"></i><i></i></div>
+    <div class="search-pill"><div>🔍 搜索</div></div>
+    <div class="dock" id="dock"></div>
+    <div class="homebar" id="homebar" style="pointer-events:none;"></div>
+  </div>
+
+  <!-- 锁屏 -->
+  <div id="lock">
+    <div id="lock-bg"></div>
+    <div id="lock-banner">
+      <img src="avatar.jpg">
+      <div style="flex:1;">
+        <div class="b-title"><span>X</span><span style="font-size:12px; color:#aaa;">现在</span></div>
+        <div class="b-desc"><b>Baek.</b> 刚刚发布了新推文。</div>
+      </div>
+    </div>
+    <div id="lock-main">
+      <div class="lock-status"><span class="battery-icon"><div class="battery-body"><div class="battery-level"></div></div><div class="battery-tip"></div></span></div>
+      <div class="lock-header"><div class="lock-date" id="lockDate">10月25日 周日</div><div class="lock-time" id="lockTime">00:35</div></div>
+      <div class="lock-footer"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+      <div class="lock-homebar"></div>
+    </div>
+    <div id="passcode-screen">
+      <div style="text-align:center; width:100%;"><div class="p-title">输入密码</div><div class="dots" id="passcode-dots"><span></span><span></span><span></span><span></span></div><div class="error" id="passcode-error">密码错误</div></div>
+      <div class="keypad" id="keypad">
+        <div class="key" data-num="1">1</div><div class="key" data-num="2">2</div><div class="key" data-num="3">3</div>
+        <div class="key" data-num="4">4</div><div class="key" data-num="5">5</div><div class="key" data-num="6">6</div>
+        <div class="key" data-num="7">7</div><div class="key" data-num="8">8</div><div class="key" data-num="9">9</div>
+        <div class="key empty"></div><div class="key" data-num="0">0</div><div class="key del" id="key-del">⌫</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 支线 App 挂载点 -->
+  <div class="app-page dark" id="app-x">
+<div id="xAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script src="x-app.js"></script>
+</body>
+</html>

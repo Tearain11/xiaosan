@@ -104,3 +104,16 @@ html, body { height: 100%; margin: 0; overflow: hidden; background: #111; color:
 .x-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 54px; background: #000; border-top: 1px solid #2f3336; display: flex; justify-content: space-around; align-items: center; z-index: 500; padding-bottom: 6px; }
 .x-nav svg { width: 26px; height: 26px; fill: #71767b; cursor: pointer; transition: fill 0.2s;}
 .x-nav svg.active { fill: #fff; }
+.homebar {
+  position: absolute !important;
+  bottom: 8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 134px !important;
+  height: 5px !important;
+  background-color: #ffffff !important;
+  border-radius: 10px !important;
+  z-index: 9999999 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}

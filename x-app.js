@@ -2,25 +2,17 @@ function initXApp() {
   const container = document.getElementById("xAppContent");
   if (container.innerHTML.trim() !== "") return; 
 
-  // 清除缓存防错
   localStorage.removeItem('xLiked');
-
-  // 锁死外层，彻底干掉右侧浏览器自带的白边滚动条
   container.style.cssText = "position:absolute; inset:0; overflow:hidden; background:#000;";
 
-  // 加一段 CSS 专门隐藏滚动条，让它像真手机一样
   if (!document.getElementById('hide-scroll')) {
     const style = document.createElement('style');
     style.id = 'hide-scroll';
-    style.innerHTML = `
-      ::-webkit-scrollbar { display: none; }
-      * { -ms-overflow-style: none; scrollbar-width: none; }
-    `;
+    style.innerHTML = `::-webkit-scrollbar { display: none; } * { -ms-overflow-style: none; scrollbar-width: none; }`;
     document.head.appendChild(style);
   }
 
   container.innerHTML = `
-    <!-- ================= 主界面 ================= -->
     <div id="x-tab-home" style="position:absolute; inset:0; background:#000; display:flex; flex-direction:column;">
       <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; border-bottom:1px solid #2f3336;">
         <svg viewBox="0 0 24 24" style="width:24px; height:24px; fill:#fff;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -50,52 +42,36 @@ function initXApp() {
       </div>
     </div>
 
-    <!-- ================= 通知页 ================= -->
     <div id="x-tab-notify" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column;">
       <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; border-bottom:1px solid #2f3336;">通知</div>
       <div id="notify-content" style="flex:1; overflow-y:auto; padding-bottom:60px;"></div>
     </div>
 
-    <!-- ================= 私信列表页 ================= -->
     <div id="x-tab-msg" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column;">
       <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; border-bottom:1px solid #2f3336;">私信</div>
       <div id="msg-list-content" style="flex:1; overflow-y:auto; padding-bottom:60px;"></div>
     </div>
 
-    <!-- ================= 边伯贤主页 (彻底重写背景和头像排版) ================= -->
     <div id="x-tab-baek" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column; overflow-y:auto; padding-bottom:60px;">
-      
-      <!-- 顶部返回栏 (固定在上方) -->
       <div style="padding-top:44px; padding:10px 16px; display:flex; align-items:center; gap:20px; position:sticky; top:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); z-index:10;">
         <span style="font-size:24px; cursor:pointer; color:#fff;" onclick="switchXTab('home')">←</span>
         <div style="font-weight:bold; font-size:18px; color:#fff;">Baek.</div>
       </div>
       
-      <!-- 背景图 (修复了被压扁的问题，设置了明确的宽高和绝对定位) -->
       <div style="position:relative; width:100%; height:150px; flex-shrink:0; background-color:#333;">
         <img src="bg.jpg" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
       </div>
 
-      <!-- 头像与资料区 (修复了头像被切一半的问题) -->
       <div style="padding: 0 15px; position:relative; margin-top:-40px;">
-        <!-- 头像 (设置了z-index确保盖在背景图之上，加了黑边) -->
         <img src="avatar.jpg" style="width:80px; height:80px; border-radius:50%; border:4px solid #000; background:#222; object-fit:cover; position:relative; z-index:5;">
-        
-        <!-- 私信按钮 -->
         <button onclick="openXChat()" style="position:absolute; right:15px; top:5px; background:#fff; color:#000; border:none; border-radius:20px; padding:8px 16px; font-weight:bold; font-size:14px; cursor:pointer; z-index:6;">私信</button>
-        
         <div style="margin-top:12px;">
           <div style="font-size:20px; font-weight:bold; color:#fff;">Baek.</div>
           <div style="color:#71767b; font-size:15px;">@baekhyun</div>
-          <div style="margin-top:10px; font-size:15px; color:#fff;">看心情更 ^ ^</div>
-          <div style="margin-top:10px; font-size:14px; color:#71767b;">
-            <span style="color:#fff; font-weight:bold;">0</span> 正在关注
-            <span style="color:#fff; font-weight:bold; margin-left:15px;">8.35万</span> 关注者
-          </div>
         </div>
       </div>
 
-      <!-- 推文列表 -->
+      <!-- 1. 刚刚 (Sit down) -->
       <div style="border-bottom:1px solid #2f3336; padding:15px; margin-top:10px;">
         <div style="display:flex; gap:10px;">
           <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
@@ -114,24 +90,7 @@ function initXApp() {
         </div>
       </div>
 
-      <div style="border-bottom:1px solid #2f3336; padding:15px;">
-        <div style="display:flex; gap:10px;">
-          <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-          <div style="flex:1;">
-            <div style="font-size:15px; color:#fff;"><b>Baek.</b> <span style="color:#71767b;">· 10月18日</span></div>
-            <div style="margin-top:5px; font-size:15px; color:#fff;">出差✈️</div>
-            <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
-              <img src="baek_plane.jpg" style="width:100%; display:block;" onerror="this.style.display='none'">
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:12px; color:#71767b; font-size:13px; padding-right:15px;">
-              <span>💬 1,204</span><span>🔁 3,186</span>
-              <span style="cursor:pointer;" onclick="triggerLike(this, '9,403', false)">🤍 9,403</span>
-              <span>📊 16.9万</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <!-- 2. 10月10日 (Black Dream) -->
       <div style="border-bottom:1px solid #2f3336; padding:15px;">
         <div style="display:flex; gap:10px;">
           <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
@@ -149,9 +108,27 @@ function initXApp() {
           </div>
         </div>
       </div>
+
+      <!-- 3. 10月18日 (出差✈️) -->
+      <div style="border-bottom:1px solid #2f3336; padding:15px;">
+        <div style="display:flex; gap:10px;">
+          <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+          <div style="flex:1;">
+            <div style="font-size:15px; color:#fff;"><b>Baek.</b> <span style="color:#71767b;">· 10月18日</span></div>
+            <div style="margin-top:5px; font-size:15px; color:#fff;">出差✈️</div>
+            <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
+              <img src="baek_plane.jpg" style="width:100%; display:block;" onerror="this.style.display='none'">
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px; color:#71767b; font-size:13px; padding-right:15px;">
+              <span>💬 1,204</span><span>🔁 3,186</span>
+              <span style="cursor:pointer;" onclick="triggerLike(this, '9,403', false)">🤍 9,403</span>
+              <span>📊 16.9万</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- ================= 玩家主页 ================= -->
     <div id="x-tab-profile" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column; overflow-y:auto; padding-bottom:60px;">
       <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; border-bottom:1px solid #2f3336;">个人资料</div>
       <div style="height:150px; background:#333; position:relative; cursor:pointer;" onclick="document.getElementById('upload-bg').click()">
@@ -173,7 +150,6 @@ function initXApp() {
       </div>
     </div>
 
-    <!-- ================= 底部导航栏 ================= -->
     <div style="position:absolute; bottom:0; left:0; right:0; height:54px; background:#000; border-top:1px solid #2f3336; display:flex; justify-content:space-around; align-items:center; padding-bottom:6px; z-index:100;">
       <svg id="nav-home" class="active" onclick="switchXTab('home')" viewBox="0 0 24 24" style="width:26px; height:26px; fill:#fff; cursor:pointer;"><path d="M12 1.696L.622 8.807l1.06 1.696L3 9.679V19.5C3 20.881 4.119 22 5.5 22h13c1.381 0 2.5-1.119 2.5-2.5V9.679l1.318.824 1.06-1.696L12 1.696zM12 16.5c-1.933 0-3.5-1.567-3.5-3.5s1.567-3.5 3.5-3.5 3.5 1.567 3.5 3.5-1.567 3.5-3.5 3.5z"/></svg>
       <svg id="nav-search" viewBox="0 0 24 24" style="width:26px; height:26px; fill:#71767b; cursor:pointer;"><path d="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781c-1.447 1.142-3.276 1.824-5.262 1.824-4.694 0-8.5-3.806-8.5-8.5z"/></svg>
@@ -188,7 +164,6 @@ function initXApp() {
       <svg id="nav-profile" onclick="switchXTab('profile')" viewBox="0 0 24 24" style="width:26px; height:26px; fill:#71767b; cursor:pointer;"><path d="M5.651 19h12.698c-.337-1.8-1.023-3.21-1.945-4.19C15.318 13.65 13.838 13 12 13s-3.317.65-4.404 1.81c-.922.98-1.608 2.39-1.945 4.19zm.486-5.56C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46zM12 4c-1.105 0-2 .9-2 2s.895 2 2 2 2-.9 2-2-.895-2-2-2zM8 6c0-2.21 1.791-4 4-4s4 1.79 4 4-1.791 4-4 4-4-1.79-4-4z"/></svg>
     </div>
 
-    <!-- ================= 私信聊天界面 ================= -->
     <div id="x-chatroom" style="position:absolute; inset:0; background:#000; z-index:1000; display:none; flex-direction:column;">
       <div style="padding: 48px 16px 10px; display:flex; align-items:center; gap:15px; border-bottom:1px solid #2f3336;">
         <span style="font-size:20px; cursor:pointer; color:#fff;" onclick="closeXChat()">←</span>
@@ -196,7 +171,6 @@ function initXApp() {
         <div style="font-weight:bold; font-size:16px;">Baek.</div>
       </div>
       <div id="xChatArea" style="flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px;"></div>
-      
       <div id="xInputFake" style="padding:10px 16px 30px; background:#000; border-top:1px solid #2f3336;">
         <div id="xInputText" style="background:#202327; color:#71767b; border-radius:20px; padding:10px 16px; font-size:15px; cursor:default; opacity:0.5;">发送私信...</div>
       </div>
@@ -205,17 +179,9 @@ function initXApp() {
   `;
 
   const savedBg = localStorage.getItem('userBg');
-  if(savedBg) {
-    const img = document.getElementById('user-bg-img');
-    img.src = savedBg; img.style.display = 'block';
-    document.getElementById('user-bg-placeholder').style.display = 'none';
-  }
+  if(savedBg) { const img = document.getElementById('user-bg-img'); img.src = savedBg; img.style.display = 'block'; document.getElementById('user-bg-placeholder').style.display = 'none'; }
   const savedAvatar = localStorage.getItem('userAvatar');
-  if(savedAvatar) {
-    const img = document.getElementById('user-avatar-img');
-    img.src = savedAvatar; img.style.display = 'block';
-    document.getElementById('user-avatar-placeholder').style.display = 'none';
-  }
+  if(savedAvatar) { const img = document.getElementById('user-avatar-img'); img.src = savedAvatar; img.style.display = 'block'; document.getElementById('user-avatar-placeholder').style.display = 'none'; }
 }
 
 function switchXTab(tabId) {
@@ -224,18 +190,11 @@ function switchXTab(tabId) {
   document.getElementById('x-tab-msg').style.display = 'none';
   document.getElementById('x-tab-baek').style.display = 'none';
   document.getElementById('x-tab-profile').style.display = 'none';
-  
   const target = document.getElementById('x-tab-' + tabId);
   if(target) target.style.display = 'flex';
-
+  
   document.querySelectorAll('svg[id^="nav-"]').forEach(el => el.style.fill = '#71767b');
-  if(tabId === 'baek') {
-    document.getElementById('nav-home').style.fill = '#fff';
-  } else {
-    const nav = document.getElementById('nav-' + tabId);
-    if(nav) nav.style.fill = '#fff';
-  }
-
+  if(tabId === 'baek') { document.getElementById('nav-home').style.fill = '#fff'; } else { const nav = document.getElementById('nav-' + tabId); if(nav) nav.style.fill = '#fff'; }
   if(tabId === 'notify') document.getElementById('notify-dot').style.display = 'none';
   if(tabId === 'msg') document.getElementById('msg-dot').style.display = 'none';
 }
@@ -245,9 +204,7 @@ function uploadUserImg(input, imgId, placeholderId) {
     const reader = new FileReader();
     reader.onload = function(e) {
       const img = document.getElementById(placeholderId === 'user-bg-placeholder' ? 'user-bg-img' : 'user-avatar-img');
-      img.src = e.target.result;
-      img.style.display = 'block';
-      document.getElementById(placeholderId).style.display = 'none';
+      img.src = e.target.result; img.style.display = 'block'; document.getElementById(placeholderId).style.display = 'none';
       localStorage.setItem(placeholderId === 'user-bg-placeholder' ? 'userBg' : 'userAvatar', e.target.result);
     };
     reader.readAsDataURL(input.files[0]);
@@ -256,44 +213,18 @@ function uploadUserImg(input, imgId, placeholderId) {
 
 function triggerLike(element, originalCount, isMainTweet) {
   if (element.classList.contains("liked")) return;
-  
-  element.classList.add("liked");
-  element.innerHTML = `❤️ ${originalCount}`;
-  element.style.color = "#f91880";
-
+  element.classList.add("liked"); element.innerHTML = `❤️ ${originalCount}`; element.style.color = "#f91880";
   if (isMainTweet && !window.hasLiked) {
     window.hasLiked = true;
-    
     const btnBaek = document.getElementById('like-btn-baek');
     if(btnBaek) { btnBaek.innerHTML = `❤️ 8.65万`; btnBaek.style.color = "#f91880"; }
     const btnHome = document.getElementById('like-btn-home');
     if(btnHome) { btnHome.innerHTML = `❤️ 8.65万`; btnHome.style.color = "#f91880"; }
-
     setTimeout(() => {
-      document.getElementById('notify-content').innerHTML = `
-        <div style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px;">
-          <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%;">
-          <div>
-            <div><b>Baek.</b> 刚刚关注了你。</div>
-            <div style="color:#71767b; font-size:13px; margin-top:5px;">刚刚</div>
-          </div>
-        </div>
-      `;
+      document.getElementById('notify-content').innerHTML = `<div style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px;"><img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%;"><div><div><b>Baek.</b> 刚刚关注了你。</div><div style="color:#71767b; font-size:13px; margin-top:5px;">刚刚</div></div></div>`;
       document.getElementById('notify-dot').style.display = 'block';
-      
       setTimeout(() => {
-        document.getElementById('msg-list-content').innerHTML = `
-          <div onclick="openXChat()" style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px; align-items:center; cursor:pointer;">
-            <img src="avatar.jpg" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
-            <div style="flex:1;">
-              <div style="display:flex; justify-content:space-between;">
-                <span style="font-weight:bold;">Baek.</span>
-                <span style="color:#71767b; font-size:13px;">刚刚</span>
-              </div>
-              <div style="color:#71767b; font-size:14px; margin-top:2px;">抓到你了。</div>
-            </div>
-          </div>
-        `;
+        document.getElementById('msg-list-content').innerHTML = `<div onclick="openXChat()" style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px; align-items:center; cursor:pointer;"><img src="avatar.jpg" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:bold;">Baek.</span><span style="color:#71767b; font-size:13px;">刚刚</span></div><div style="color:#71767b; font-size:14px; margin-top:2px;">抓到你了。</div></div></div>`;
         document.getElementById('msg-dot').style.display = 'block';
       }, 2000);
     }, 1500);
@@ -303,33 +234,20 @@ function triggerLike(element, originalCount, isMainTweet) {
 let xChatStarted = false;
 function openXChat() {
   document.getElementById('x-chatroom').style.display = 'flex';
-  if(!xChatStarted) {
-    xChatStarted = true;
-    startXChat();
-  }
+  if(!xChatStarted) { xChatStarted = true; startXChat(); }
 }
-function closeXChat() {
-  document.getElementById('x-chatroom').style.display = 'none';
-}
+function closeXChat() { document.getElementById('x-chatroom').style.display = 'none'; }
 
 function startXChat() {
-  const area = document.getElementById("xChatArea");
-  area.innerHTML = "";
-  
-  const inputBox = document.getElementById("xInputText");
-  inputBox.style.opacity = "0.5";
-  inputBox.style.cursor = "default";
-  inputBox.onclick = null;
-
+  const area = document.getElementById("xChatArea"); area.innerHTML = "";
+  const inputBox = document.getElementById("xInputText"); inputBox.style.opacity = "0.5"; inputBox.style.cursor = "default"; inputBox.onclick = null;
   addXBubble("them", "抓到你了。", false);
   setTimeout(() => {
     const unreadMeta = document.getElementById("last-meta");
     if(unreadMeta) unreadMeta.innerHTML = `刚刚 · <span style="color:#71767b;">已读</span>`;
     setTimeout(() => {
       addXBubble("them", "啊，变成已读了。", false);
-      setTimeout(() => {
-        addXBubble("them", "姐姐看私信很快呢。", true);
-      }, 1500);
+      setTimeout(() => { addXBubble("them", "姐姐看私信很快呢。", true); }, 1500);
     }, 1500);
   }, 2000);
 }
@@ -338,58 +256,29 @@ function addXBubble(from, text, showChoices) {
   const area = document.getElementById("xChatArea");
   const row = document.createElement("div");
   row.style.display = "flex"; row.style.gap = "10px"; row.style.maxWidth = "85%"; row.style.alignItems = "flex-end";
-  row.style.alignSelf = from === "them" ? "flex-start" : "flex-end";
-  row.style.flexDirection = from === "them" ? "row" : "row-reverse";
+  row.style.alignSelf = from === "them" ? "flex-start" : "flex-end"; row.style.flexDirection = from === "them" ? "row" : "row-reverse";
   const timeText = from === "them" ? "刚刚 · <span style='color:#71767b;'>未读</span>" : "刚刚 · 已读";
   row.innerHTML = `<div><div style="padding:12px 16px; border-radius:20px; font-size:15px; line-height:1.4; background:${from === 'them' ? '#2f3336' : '#1d9bf0'}; color:#fff; border-bottom-${from === 'them' ? 'left' : 'right'}-radius:4px;">${text}</div><div ${from === "them" ? 'id="last-meta"' : ''} style="font-size:11px; color:#71767b; display:flex; justify-content:${from === 'them' ? 'flex-start' : 'flex-end'}; margin-top:4px; gap:4px;">${timeText}</div></div>`;
-  area.appendChild(row);
-  area.scrollTop = area.scrollHeight;
-
-  if (showChoices) {
-    setTimeout(() => {
-      const inputBox = document.getElementById("xInputText");
-      inputBox.style.opacity = "1";
-      inputBox.style.cursor = "pointer";
-      inputBox.onclick = showXChoices;
-    }, 500);
-  }
+  area.appendChild(row); area.scrollTop = area.scrollHeight;
+  if (showChoices) { setTimeout(() => { const inputBox = document.getElementById("xInputText"); inputBox.style.opacity = "1"; inputBox.style.cursor = "pointer"; inputBox.onclick = showXChoices; }, 500); }
 }
 
 function showXChoices() {
   const inputBox = document.getElementById("xInputText");
-  if(inputBox.onclick === null) return; 
-  inputBox.onclick = null; 
-  inputBox.style.cursor = "default";
-
-  const choicesDiv = document.getElementById("xChoices");
-  choicesDiv.style.display = "flex";
-  choicesDiv.innerHTML = "";
-
+  if(inputBox.onclick === null) return; inputBox.onclick = null; inputBox.style.cursor = "default";
+  const choicesDiv = document.getElementById("xChoices"); choicesDiv.style.display = "flex"; choicesDiv.innerHTML = "";
   const options = [
     { text: "你每天都在盯着谁给你点赞吗？", next: "你每天都在盯着谁给你点赞吗？", reply: "才不是呢。我这半个月，只盯着姐姐一个人的主页看。" },
     { text: "脸长得不错，仅此而已。", next: "脸长得不错，仅此而已。", reply: "那视频呢？视频里的我，姐姐觉得怎么样？" }
   ];
-
   options.forEach(opt => {
-    const btn = document.createElement("button");
-    btn.textContent = opt.text;
+    const btn = document.createElement("button"); btn.textContent = opt.text;
     btn.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer;";
-    
     btn.onclick = () => {
-      choicesDiv.style.display = "none";
-      addXBubble("me", opt.next, false);
-      
-      // 清空文字，变灰，锁定
-      const inputBox = document.getElementById("xInputText");
-      inputBox.style.opacity = "0.3";
-      inputBox.textContent = ""; 
-      inputBox.style.cursor = "default";
-
+      choicesDiv.style.display = "none"; addXBubble("me", opt.next, false);
+      const inputBox = document.getElementById("xInputText"); inputBox.style.opacity = "0.3"; inputBox.textContent = ""; inputBox.style.cursor = "default";
       document.querySelectorAll('#xChatArea span').forEach(el => { if(el.textContent === '未读') el.textContent = '已读'; });
-      
-      setTimeout(() => {
-        addXBubble("them", opt.reply, false);
-      }, 1500);
+      setTimeout(() => { addXBubble("them", opt.reply, false); }, 1500);
     };
     choicesDiv.appendChild(btn);
   });

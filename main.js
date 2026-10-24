@@ -63,22 +63,22 @@ const SVGS = {
 };
 
 const APPS = [
-  { id:"photos", name:"照片", cls:"", html:`<div style="width:100%;height:100%;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:36px">🌸</div>` },
-  { id:"calendar", name:"日历", cls:"ico-cal", html:`<div class="c-top">周六</div><div class="c-num">24</div>` },
-  { id:"weather", name:"天气", cls:"ico-weather", html:`<div class="sun"></div><div class="cloud"></div>` },
-  { id:"clock", name:"时钟", cls:"ico-clock", html:`<div class="face"><div class="h1"></div><div class="h1" style="transform:translateX(-50%) rotate(180deg);background:#ff9500;height:22px;"></div></div>` },
-  { id:"x", name:"X", cls:"ico-x", html:"𝕏" },
-  { id:"notes", name:"备忘录", cls:"ico-notes", html:`<div style="width:36px;height:2px;background:#000;margin:3px auto;opacity:0.2"></div><div style="width:36px;height:2px;background:#000;margin:3px auto;opacity:0.2"></div>` },
-  { id:"mail", name:"邮件", cls:"ico-mail", html:SVGS.mail },
-  { id:"contacts", name:"通讯录", cls:"", html:`<div style="width:100%;height:100%;background:#e5e5ea;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px">👤</div>` },
-  { id:"settings", name:"设置", cls:"ico-settings", html:SVGS.settings }
+  { id:"photos", name:"照片", cls:"", html:`<img src="icon_photos.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"calendar", name:"日历", cls:"", html:`<img src="icon_calendar.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"weather", name:"天气", cls:"", html:`<img src="icon_weather.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"clock", name:"时钟", cls:"", html:`<img src="icon_clock.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"x", name:"X", cls:"", html:`<img src="icon_x.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"notes", name:"备忘录", cls:"", html:`<img src="icon_notes.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"mail", name:"邮件", cls:"", html:`<img src="icon_mail.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"contacts", name:"通讯录", cls:"", html:`<img src="icon_contacts.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"settings", name:"设置", cls:"", html:`<img src="icon_settings.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` }
 ];
 
 const DOCK_APPS = [
-  { id:"phone", name:"电话", cls:"ico-phone", html:SVGS.phone },
-  { id:"safari", name:"Safari", cls:"ico-safari", html:`🧭` },
-  { id:"msg", name:"信息", cls:"ico-msg", html:SVGS.msg },
-  { id:"music", name:"音乐", cls:"ico-music", html:SVGS.music }
+  { id:"phone", name:"电话", cls:"", html:`<img src="icon_phone.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"safari", name:"Safari", cls:"", html:`<img src="icon_safari.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"msg", name:"信息", cls:"", html:`<img src="icon_msg.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` },
+  { id:"music", name:"音乐", cls:"", html:`<img src="icon_music.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` }
 ];
 
 const OPENABLE = new Set(["x"]);
@@ -120,3 +120,6 @@ function init(){
   renderApps();
 }
 document.addEventListener("DOMContentLoaded", init);
+function goHome() {
+  document.querySelectorAll(".app-page").forEach(s => s.classList.remove("active"));
+}

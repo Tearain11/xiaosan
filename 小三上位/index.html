@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>iOS Phone</title>
+<style>
+/* ================= 基础重置 ================= */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: #111; color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; user-select: none; }
+
+/* 电脑端：模拟手机外框；手机端：全屏 */
+#phone { position: relative; width: 100%; height: 100%; background: #000; overflow: hidden; margin: 0 auto; }
+@media (min-width: 500px) {
+  body { display: flex; align-items: center; justify-content: center; background: #111; }
+  #phone { width: 390px; height: 844px; border-radius: 55px; box-shadow: 0 0 0 12px #000, 0 0 0 14px #333, 0 20px 40px rgba(0,0,0,0.5); border: 4px solid #000; }
+}
+
+/* 顶部灵动岛 (仅桌面端显示) */
+.notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 120px; height: 34px; background: #000; border-radius: 20px; z-index: 10000; }
+@media (max-width: 500px) { .notch { display: none; } }
+
+/* ================= 壁纸 ================= */
+.wallpaper { position: absolute; inset: 0; background-size: cover; background-position: center; background-color: #1c1c1e; z-index: 0; background-image: linear-gradient(180deg, #1a1a1a 0%, #333 100%); }
+.wallpaper::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.4)); }
+
+/* ================= 状态栏电量图标 ================= */
+.battery-icon { display: inline-flex; align-items: center; gap: 2px; }
+.battery-body { width: 24px; height: 12px; border: 1.5px solid #fff; border-radius: 3.5px; padding: 1px; position: relative; }
+.battery-level { width: 85%; height: 100%; background: #fff; border-radius: 1.5px; }
+.battery-tip { width: 2px; height: 4px; background: #fff; border-radius: 0 1px 1px 0; opacity: 0.8; }
+
+/* ================= 锁屏层 (完全不透明) ================= */
+#lock { position: absolute; inset: 0; z-index: 9999; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease; background: #000; }
+#lock.unlocked { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+
+/* 锁屏背景与暗色遮罩 */
+#lock-bg { position: absolute; inset: 0; background-size: cover; background-position: center; background-image: url('wallpaper.jpg'); }
+#lock-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.2) 80%); }
+
+/* 锁屏主界面 */
+#lock-main { position: absolute; inset: 0; display: flex; flex-direction: column; transition: opacity 0.3s, transform 0.3s; }
+#lock-main.passcode-active { opacity: 0; transform: scale(0.95); pointer-events: none; }
+
+/* 锁屏状态栏 (去掉了中国移动，只保留右侧电量) */
+.lock-status { display: flex; justify-content: flex-end; align-items: center; padding: 16px 24px 0; font-size: 15px; font-weight: 600; color: #fff; }
+
+/* 锁屏日期与时间 */
+.lock-header { margin-top: 40px; text-align: center; }
+.lock-date { font-size: 20px; font-weight: 600; color: rgba(255,255,255,0.9); letter-spacing: 1px; }
+.lock-time { font-size: 96px; font-weight: 700; letter-spacing: -2px; color: transparent; -webkit-text-stroke: 2.5px rgba(255,255,255,0.75); margin-top: -5px; }
+
+/* 锁屏底部 */
+.lock-footer { margin-top: auto; padding: 0 40px 50px; display: flex; justify-content: space-between; align-items: center; }
+.lock-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.lock-homebar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff; }
+
+/* 密码输入界面 */
+#passcode-screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 100px 0 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(0,0,0,0.6); }
+#passcode-screen.active { opacity: 1; pointer-events: auto; }
+#passcode-screen .p-title { font-size: 16px; font-weight: 500; text-align: center; margin-bottom: 20px; }
+#passcode-screen .dots { display: flex; justify-content: center; gap: 16px; }
+#passcode-screen .dots span { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #fff; }
+#passcode-screen .dots span.filled { background: #fff; }
+#passcode-screen .error { color: #ff3b30; font-size: 14px; margin-top: 10px; opacity: 0; transition: opacity 0.2s; text-align: center; }
+#passcode-screen .error.show { opacity: 1; }
+
+/* 数字键盘 */
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 25px; margin-bottom: 30px; }
+.key { width: 75px; height: 75px; border-radius: 50%; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 32px; font-weight: 400; cursor: pointer; transition: background 0.1s; }
+.key:active { background: rgba(255,255,255,0.4); }
+.key .sub { font-size: 10px; letter-spacing: 2px; margin-top: -2px; }
+.key.empty { background: transparent; pointer-events: none; }
+.key.del { background: transparent; font-size: 22px; }
+
+/* ================= 桌面 ================= */
+#home { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; padding: 0 18px; }
+.statusbar { position: relative; z-index: 20; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; font-size: 15px; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.3); padding-top: 4px; }
+
+.widgets { display: flex; gap: 14px; margin-bottom: 24px; margin-top: 6px; }
+.widget { flex: 1; border-radius: 20px; padding: 12px 14px; background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); min-height: 90px; display: flex; flex-direction: column; justify-content: space-between; }
+.widget .w-title { font-size: 12px; font-weight: 500; opacity: 0.9; display: flex; justify-content: space-between; }
+.widget .w-big { font-size: 24px; font-weight: 400; }
+.widget .w-sub { font-size: 12px; opacity: 0.8; }
+.widget .ev { font-size: 12px; margin-top: 3px; display: flex; gap: 6px; }
+.widget .ev b { font-weight: 600; }
+
+/* 应用网格 */
+.apps { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px 10px; align-content: start; }
+.app { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: transform 0.1s; }
+.app:active { transform: scale(0.85); opacity: 0.8; }
+.app .ico { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2); position: relative; }
+.app .nm { font-size: 11px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); max-width: 72px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* 分页和搜索 */
+.page-dots { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
+.page-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+.page-dots i.on { background: #fff; }
+.search-pill { display: flex; justify-content: center; margin-bottom: 25px; }
+.search-pill div { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 5px 14px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+
+/* Dock */
+.dock { position: absolute; left: 14px; right: 14px; bottom: 26px; height: 88px; border-radius: 32px; background: rgba(255,255,255,0.15); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-around; padding: 0 10px; z-index: 2; }
+.homebar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff; z-index: 50; cursor: pointer; }
+.app-homebar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #000; z-index: 900; cursor: pointer; opacity: 0.3; }
+.dark .app-homebar { background: #fff; opacity: 0.5; }
+
+/* ================= 纯 CSS 精致高仿图标 ================= */
+.ico-cal { background: #fff; color: #000; flex-direction: column; font-weight: 400; }
+.ico-cal .c-top { color: #ff3b30; font-size: 11px; margin-top: 4px; font-weight: 600; }
+.ico-cal .c-num { font-size: 32px; font-weight: 300; line-height: 1; margin-top: -2px; }
+.ico-weather { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); flex-direction: column; }
+.ico-weather .cloud { width: 30px; height: 14px; background: #fff; border-radius: 10px; position: relative; margin-top: 10px;}
+.ico-weather .cloud::before { content: ''; position: absolute; width: 16px; height: 16px; background: #fff; border-radius: 50%; top: -8px; left: 4px; }
+.ico-weather .cloud::after { content: ''; position: absolute; width: 12px; height: 12px; background: #fff; border-radius: 50%; top: -6px; right: 4px; }
+.ico-weather .sun { position: absolute; width: 14px; height: 14px; background: #ffcc00; border-radius: 50%; top: 12px; right: 12px; }
+.ico-clock { background: #fff; color: #000; position: relative; }
+.ico-clock .face { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; }
+.ico-clock .hand { position: absolute; background: #000; transform-origin: bottom; border-radius: 2px;}
+.ico-clock .h1 { width: 2px; height: 16px; bottom: 50%; left: 50%; transform: translateX(-50%) rotate(45deg); }
+.ico-clock .h2 { width: 1.5px; height: 22px; bottom: 50%; left: 50%; transform: translateX(-50%) rotate(180deg); background: #ff9500;}
+.ico-x { background: #000; color: #fff; font-size: 34px; font-weight: 500; font-family: sans-serif; }
+.ico-notes { background: #ffd60a; flex-direction: column; }
+.ico-notes .line { width: 36px; height: 2px; background: #000; margin: 3px 0; opacity: 0.2; }
+.ico-mail { background: #007aff; }
+.ico-mail svg { width: 38px; height: 38px; fill: #fff; }
+.ico-contacts { background: #e5e5ea; position: relative; overflow: visible !important; }
+.ico-contacts .book { width: 50px; height: 50px; background: #fff; border-radius: 6px; border-left: 6px solid #ff9500; display: flex; align-items: center; justify-content: center; }
+.ico-settings { background: #8e8e93; }
+.ico-settings svg { width: 36px; height: 36px; fill: #fff; }
+
+.ico-phone { background: #34c759; }
+.ico-phone svg { width: 38px; height: 38px; fill: #fff; }
+.ico-safari { background: #fff; }
+.ico-msg { background: #34c759; }
+.ico-msg svg { width: 38px; height: 38px; fill: #fff; }
+.ico-music { background: #ff3b30; }
+.ico-music svg { width: 36px; height: 36px; fill: #fff; }
+
+/* ================= App 页面容器 ================= */
+.app-page { position: absolute; inset: 0; background: #fff; color: #000; z-index: 200; display: none; flex-direction: column; }
+.app-page.active { display: flex; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes slideIn { from { transform: scale(0.9); opacity: 0; border-radius: 50px; } to { transform: scale(1); opacity: 1; border-radius: 0; } }
+.app-page.dark { background: #000; color: #fff; }
+.app-nav { padding: 48px 16px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 17px; font-weight: 600; flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.1); }
+.app-page.dark .app-nav { border-bottom: 1px solid rgba(255,255,255,0.1); }
+.app-nav .back { color: var(--ios-blue, #007aff); font-weight: 400; cursor: pointer; font-size: 16px; }
+.app-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 34px; display: flex; align-items: center; justify-content: center; color: #888; }
+</style>
+</head>
+<body>
+<div id="phone">
+  <div class="notch"></div>
+  <div class="wallpaper" id="wallpaper"></div>
+
+  <!-- 桌面 -->
+  <div id="home">
+    <div class="statusbar">
+      <span id="homeClock">00:00</span>
+      <span class="battery-icon">
+        <div class="battery-body"><div class="battery-level"></div></div>
+        <div class="battery-tip"></div>
+      </span>
+    </div>
+    
+    <div class="widgets">
+      <div class="widget" id="wWeather"></div>
+      <div class="widget" id="wEvents"></div>
+    </div>
+
+    <div class="apps" id="apps"></div>
+
+    <div class="page-dots"><i class="on"></i><i></i></div>
+    <div class="search-pill"><div>🔍 搜索</div></div>
+
+    <div class="dock" id="dock"></div>
+    <div class="homebar" id="homebar" style="pointer-events:none;"></div>
+  </div>
+
+  <!-- 锁屏层 -->
+  <div id="lock">
+    <div id="lock-bg"></div>
+    
+    <!-- 锁屏主视觉 -->
+    <div id="lock-main">
+      <div class="lock-status">
+        <span class="battery-icon" style="transform: scale(0.9);">
+          <div class="battery-body"><div class="battery-level"></div></div>
+          <div class="battery-tip"></div>
+        </span>
+      </div>
+      <div class="lock-header">
+        <div class="lock-date" id="lockDate">10月25日 周日</div>
+        <div class="lock-time" id="lockTime">00:35</div>
+      </div>
+      <div class="lock-footer">
+        <div class="lock-btn">🔦</div>
+        <div class="lock-btn">📷</div>
+      </div>
+      <div class="lock-homebar"></div>
+    </div>
+
+    <!-- 密码输入层 -->
+    <div id="passcode-screen">
+      <div style="text-align: center; width: 100%;">
+        <div class="p-title">输入密码</div>
+        <div class="dots" id="passcode-dots">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="error" id="passcode-error">密码错误</div>
+      </div>
+      <div class="keypad" id="keypad">
+        <div class="key" data-num="1"><span>1</span><span class="sub"> </span></div>
+        <div class="key" data-num="2"><span>2</span><span class="sub">ABC</span></div>
+        <div class="key" data-num="3"><span>3</span><span class="sub">DEF</span></div>
+        <div class="key" data-num="4"><span>4</span><span class="sub">GHI</span></div>
+        <div class="key" data-num="5"><span>5</span><span class="sub">JKL</span></div>
+        <div class="key" data-num="6"><span>6</span><span class="sub">MNO</span></div>
+        <div class="key" data-num="7"><span>7</span><span class="sub">PQRS</span></div>
+        <div class="key" data-num="8"><span>8</span><span class="sub">TUV</span></div>
+        <div class="key" data-num="9"><span>9</span><span class="sub">WXYZ</span></div>
+        <div class="key empty"></div>
+        <div class="key" data-num="0"><span>0</span><span class="sub"> </span></div>
+        <div class="key del" id="key-del">⌫</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 各 App 页面 -->
+  <div class="app-page dark" id="app-x">
+    <div class="app-nav"><span class="back" data-home>‹ 返回</span><span>X</span><span style="width:40px"></span></div>
+    <div class="app-body">X 页面（待开发）</div>
+    <div class="app-homebar" data-home></div>
+  </div>
+  
+  <div class="app-page" id="app-phone">
+    <div class="app-nav"><span class="back" data-home>‹ 返回</span><span>电话</span><span style="width:40px"></span></div>
+    <div class="app-body">电话页面（待开发）</div>
+    <div class="app-homebar" data-home></div>
+  </div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const CONFIG = {
+  wallpaper: "wallpaper.jpg", 
+  passcode: "0506",
+  weather: { place:"首尔", temp:"18°", desc:"多云", high:"21°", low:"12°" },
+  events: [ { time:"09:30", title:"晨会" }, { time:"19:00", title:"和TA吃饭" } ]
+};
+
+const $ = id => document.getElementById(id);
+
+// 应用壁纸 (桌面)
+function applyWallpaper(){
+  if(CONFIG.wallpaper) {
+    $("wallpaper").style.backgroundImage = `url("${CONFIG.wallpaper}")`;
+  }
+}
+
+// 实时时钟与日期
+function updateClock(){
+  const d = new Date();
+  const hm = d.getHours().toString().padStart(2,"0") + ":" + d.getMinutes().toString().padStart(2,"0");
+  
+  // 桌面时间
+  $("homeClock").textContent = hm;
+  
+  // 锁屏时间
+  $("lockTime").textContent = hm;
+  
+  // 锁屏日期 (例如：10月25日 周日)
+  const wd = ["周日","周一","周二","周三","周四","周五","周六"][d.getDay()];
+  $("lockDate").textContent = `${d.getMonth()+1}月${d.getDate()}日 ${wd}`;
+}
+
+// ================= 锁屏与密码逻辑 =================
+let currentPin = "";
+
+function showPasscode() {
+  $("lock-main").classList.add("passcode-active");
+  $("passcode-screen").classList.add("active");
+}
+
+// 鼠标/手指上滑呼出密码，或者直接点击
+let startY = null;
+const lockScreen = $("lock");
+lockScreen.addEventListener("touchstart", e => { startY = e.touches[0].clientY; }, {passive:true});
+lockScreen.addEventListener("touchmove", e => { if(startY !== null && startY - e.touches[0].clientY > 50){ showPasscode(); startY = null; } }, {passive:true});
+lockScreen.addEventListener("mousedown", e => { startY = e.clientY; });
+lockScreen.addEventListener("mouseup", e => { if(startY !== null && startY - e.clientY > 50) showPasscode(); startY = null; });
+
+$("lock-main").addEventListener("click", showPasscode);
+
+// 数字键盘点击
+$("keypad").addEventListener("click", e => {
+  const key = e.target.closest(".key");
+  if(!key || key.classList.contains("empty")) return;
+
+  if (key.id === "key-del") {
+    currentPin = currentPin.slice(0, -1);
+  } else {
+    if (currentPin.length < 4) {
+      currentPin += key.dataset.num;
+    }
+  }
+  updateDots();
+
+  if (currentPin.length === 4) {
+    setTimeout(checkPin, 200);
+  }
+});
+
+function updateDots() {
+  const dots = $("passcode-dots").children;
+  for (let i = 0; i < 4; i++) {
+    if (i < currentPin.length) dots[i].classList.add("filled");
+    else dots[i].classList.remove("filled");
+  }
+}
+
+function checkPin() {
+  if (currentPin === CONFIG.passcode) {
+    $("lock").classList.add("unlocked");
+  } else {
+    $("passcode-error").classList.add("show");
+    $("passcode-dots").style.animation = "shake 0.3s";
+    setTimeout(() => {
+      currentPin = "";
+      updateDots();
+      $("passcode-error").classList.remove("show");
+      $("passcode-dots").style.animation = "";
+    }, 800);
+  }
+}
+
+const style = document.createElement('style');
+style.innerHTML = `@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }`;
+document.head.appendChild(style);
+
+
+// ================= 桌面渲染 =================
+function renderWidgets(){
+  const w = CONFIG.weather;
+  $("wWeather").innerHTML = `
+    <div class="w-title"><span>📍 ${w.place}</span></div>
+    <div class="w-big">${w.temp}</div>
+    <div class="w-sub">${w.desc} · 最高${w.high} 最低${w.low}</div>`;
+  $("wEvents").innerHTML = `
+    <div class="w-title"><span>🗓 日程</span></div>
+    ${CONFIG.events.map(ev => `<div class="ev"><b>${ev.time}</b> <span>${ev.title}</span></div>`).join("")}`;
+}
+
+// 内置精细 SVG
+const SVGS = {
+  mail: `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>`,
+  phone: `<svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>`,
+  msg: `<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>`,
+  music: `<svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`
+};
+
+// 桌面 Apps
+const APPS = [
+  { id:"photos", name:"照片", cls:"", html:`<div style="width:100%;height:100%;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:36px">🌸</div>` },
+  { id:"calendar", name:"日历", cls:"ico-cal", html:`<div class="c-top">周六</div><div class="c-num">24</div>` },
+  { id:"weather", name:"天气", cls:"ico-weather", html:`<div class="sun"></div><div class="cloud"></div>` },
+  { id:"clock", name:"时钟", cls:"ico-clock", html:`<div class="face"><div class="hand h1"></div><div class="hand h2"></div></div>` },
+  { id:"x", name:"X", cls:"ico-x", html:"𝕏" },
+  { id:"notes", name:"备忘录", cls:"ico-notes", html:`<div class="line"></div><div class="line"></div><div class="line"></div>` },
+  { id:"mail", name:"邮件", cls:"ico-mail", html:SVGS.mail },
+  { id:"contacts", name:"通讯录", cls:"ico-contacts", html:`<div class="book" style="font-size:24px">👤</div>` },
+  { id:"settings", name:"设置", cls:"ico-settings", html:SVGS.settings }
+];
+
+const DOCK_APPS = [
+  { id:"phone", name:"电话", cls:"ico-phone", html:SVGS.phone },
+  { id:"safari", name:"Safari", cls:"ico-safari", html:`<div style="width:100%;height:100%;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:38px;color:#007aff">🧭</div>` },
+  { id:"msg", name:"信息", cls:"ico-msg", html:SVGS.msg },
+  { id:"music", name:"音乐", cls:"ico-music", html:SVGS.music }
+];
+
+const OPENABLE = new Set(["phone","x"]);
+
+function createAppHTML(a) {
+  return `<div class="app" data-app="${a.id}">
+    <div class="ico ${a.cls}">${a.html}</div>
+    <div class="nm">${a.name}</div>
+  </div>`;
+}
+
+function renderApps(){
+  $("apps").innerHTML = APPS.map(createAppHTML).join("");
+  $("dock").innerHTML = DOCK_APPS.map(createAppHTML).join("");
+  
+  document.querySelectorAll(".app").forEach(el => {
+    const id = el.dataset.app;
+    if(!OPENABLE.has(id)) return; 
+    el.addEventListener("click", () => openApp(id));
+  });
+}
+
+function openApp(id) {
+  document.querySelectorAll(".app-page").forEach(s => s.classList.remove("active"));
+  const el = $("app-" + id);
+  if(el) el.classList.add("active");
+}
+
+document.addEventListener("click", e => {
+  if(e.target.closest("[data-home]")) {
+    document.querySelectorAll(".app-page").forEach(s => s.classList.remove("active"));
+  }
+});
+
+function init(){
+  applyWallpaper();
+  updateClock(); setInterval(updateClock, 10000);
+  renderWidgets();
+  renderApps();
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

@@ -42,7 +42,7 @@ function initMsgApp() {
   if (!document.getElementById("lock-msg-banner")) {
     const banner = document.createElement("div");
     banner.id = "lock-msg-banner";
-    banner.style.cssText = "position:absolute; top:50%; left:16px; right:16px; background:rgba(50,50,50,0.6); backdrop-filter:blur(25px); border-radius:20px; padding:14px 16px; display:flex; gap:12px; transform:scale(0.9); opacity:0; transition:all 0.4s; z-index:9999; border:1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);";
+banner.style.cssText = "position:absolute; top:50%; left:16px; right:16px; background:rgba(50,50,50,0.6); backdrop-filter:blur(25px); border-radius:20px; padding:14px 16px; display:flex; gap:12px; transform:scale(0.9); opacity:0; transition:all 0.4s; z-index:9999; border:1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events:none;";
     banner.innerHTML = `<div style="width:42px; height:42px; border-radius:8px; background:#8e8e93; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff;">👤</div><div style="flex:1; text-align:left;"><div style="font-size:14px; font-weight:600; color:#fff; display:flex; justify-content:space-between; align-items:center;"><span>${t.msg_title}</span><span style="font-size:12px; color:#aaa;">${t.tw_just_now}</span></div><div style="font-size:14px; color:#eee; margin-top:4px; line-height:1.3;"><b>${t.msg_boyfriend}</b>：${t.msg_1}</div></div>`;
     document.getElementById("phone").appendChild(banner);
     

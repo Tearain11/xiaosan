@@ -117,3 +117,25 @@ html, body { height: 100%; margin: 0; overflow: hidden; background: #111; color:
   cursor: pointer !important;
   pointer-events: auto !important;
 }
+/* 让短信横幅和推特横幅绝对不挡住密码键盘的点击 */
+#lock-banner, #lock-msg-banner {
+  pointer-events: none !important;
+}
+
+/* 确保密码键盘的层级高到天上 */
+#passcode-screen {
+  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)) !important; 
+  z-index: 2147483647 !important; 
+}
+.keypad {
+  position: relative;
+  z-index: 2147483647 !important;
+}
+/* 强制让通知弹窗不能点击，把触摸事件全部让给密码键盘 */
+#lock-banner, #lock-msg-banner {
+  pointer-events: none !important;
+}
+/* 强制把密码键盘的层级拉到最高，防止被任何东西盖住 */
+#passcode-screen {
+  z-index: 999999 !important;
+}

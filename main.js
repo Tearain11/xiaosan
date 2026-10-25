@@ -172,12 +172,14 @@ function forceGlobalHomebar() {
   if(!document.getElementById("global-homebar")) {
     const bar = document.createElement("div");
     bar.id = "global-homebar";
-    // 只留最底部 24px 的点击区域，不挡密码键盘
-    bar.style.cssText = "position:fixed !important; bottom:0 !important; left:0 !important; right:0 !important; height:24px !important; z-index:2147483647 !important; cursor:pointer !important; pointer-events:auto !important;";
     
-    // 加上那根实体的小白线，让你知道点哪里
+    // 核心修复：高度设为 15px，只占最底下一点点，绝对不挡密码键盘！
+    // pointer-events: auto 确保它一定能点！
+    bar.style.cssText = "position:fixed !important; bottom:0 !important; left:0 !important; right:0 !important; height:15px !important; z-index: 9999999 !important; cursor:pointer !important; pointer-events:auto !important; background: transparent !important;";
+    
+    // 纯白细线
     const visual = document.createElement("div");
-    visual.style.cssText = "position:absolute; bottom:8px; left:50%; transform:translateX(-50%); width:134px; height:5px; border-radius:3px; background:#ffffff; pointer-events:none; opacity:0.8;";
+    visual.style.cssText = "position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:134px; height:5px; border-radius:3px; background:#ffffff; pointer-events:none; opacity:0.8;";
     bar.appendChild(visual);
     
     bar.onclick = function(e) { 

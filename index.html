@@ -11,32 +11,28 @@
   <div class="notch"></div>
   <div class="wallpaper" id="wallpaper"></div>
 
-  <!-- 桌面 -->
   <div id="home">
-    <div class="statusbar">
-      <span id="homeClock">00:00</span>
-      <span class="battery-icon"><div class="battery-body"><div class="battery-level"></div></div><div class="battery-tip"></div></span>
-    </div>
+    <div class="statusbar"><span id="homeClock">00:00</span><span class="battery-icon"><div class="battery-body"><div class="battery-level"></div></div><div class="battery-tip"></div></span></div>
+    
+    <!-- 天气和日程的小组件 -->
     <div class="widgets">
       <div class="widget" id="wWeather"></div>
       <div class="widget" id="wEvents"></div>
     </div>
+    
     <div class="apps" id="apps"></div>
     <div class="page-dots"><i class="on"></i><i></i></div>
     <div class="search-pill"><div>🔍 搜索</div></div>
+    
     <div class="dock" id="dock"></div>
-    <div class="homebar" id="homebar" style="pointer-events:none;"></div>
+    <div class="homebar" id="homebar" onclick="goHome()"></div>
   </div>
 
-  <!-- 锁屏 -->
   <div id="lock">
     <div id="lock-bg"></div>
     <div id="lock-banner">
       <img src="avatar.jpg">
-      <div style="flex:1;">
-        <div class="b-title"><span>X</span><span style="font-size:12px; color:#aaa;">现在</span></div>
-        <div class="b-desc"><b>Baek.</b> 刚刚发布了新推文。</div>
-      </div>
+      <div style="flex:1;"><div class="b-title"><span>X</span><span style="font-size:12px; color:#aaa;">现在</span></div><div class="b-desc"><b>Baek.</b> 刚刚发布了新推文。</div></div>
     </div>
     <div id="lock-main">
       <div class="lock-status"><span class="battery-icon"><div class="battery-body"><div class="battery-level"></div></div><div class="battery-tip"></div></span></div>
@@ -55,14 +51,16 @@
     </div>
   </div>
 
-  <!-- 支线 App 挂载点 -->
-  <div class="app-page dark" id="app-x">
-<div id="xAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div>
-  </div>
-</div>
+  <div class="app-page" id="app-msg"><div id="msgAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div></div>
+  <div class="app-page dark" id="app-x"><div id="xAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div></div>
+ 
+  <!-- 设置 App 挂载点 -->
+  <div class="app-page" id="app-settings"><div id="settingsAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div></div>
 
-<div class="homebar" id="homebar" onclick="goHome()"></div>
-<script src="main.js"></script>
-<script src="x-app.js"></script>
+  <script src="main.js"></script>
+  <script src="msg-app.js"></script>
+  <script src="x-app.js"></script>
+  <script src="settings.js"></script>
+</div>
 </body>
 </html>

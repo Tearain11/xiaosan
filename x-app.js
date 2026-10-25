@@ -1,18 +1,9 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
-  if (container.innerHTML.trim() !== "") return; 
-
-  localStorage.removeItem('xLiked');
-  container.style.cssText = "position:absolute; inset:0; overflow:hidden; background:#000; padding-bottom: 20px;";
-
-  if (!document.getElementById('hide-scroll')) {
-    const style = document.createElement('style');
-    style.id = 'hide-scroll'; style.innerHTML = `::-webkit-scrollbar { display: none; } * { -ms-overflow-style: none; scrollbar-width: none; }`;
-    document.head.appendChild(style);
-  }
+  if (container.innerHTML.trim() !== "") return;
 
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
-  const t = window.trans[lang];
+  const t = window.trans[lang] || window.trans['zh-CN'];
 
   container.innerHTML = `
     <div id="x-tab-home" style="position:absolute; inset:0; background:#000; display:flex; flex-direction:column;">
@@ -42,6 +33,16 @@ function initXApp() {
           </div>
         </div>
       </div>
+    </div>
+
+    <div id="x-tab-notify" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column;">
+      <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; border-bottom:1px solid #2f3336;">${t.tw_notify}</div>
+      <div id="notify-content" style="flex:1; overflow-y:auto; padding-bottom:60px;"></div>
+    </div>
+
+    <div id="x-tab-msg" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column;">
+      <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; border-bottom:1px solid #2f3336;">${t.tw_msg}</div>
+      <div id="msg-list-content" style="flex:1; overflow-y:auto; padding-bottom:60px;"></div>
     </div>
 
     <div id="x-tab-baek" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column; overflow-y:auto; padding-bottom:60px;">
@@ -77,39 +78,26 @@ function initXApp() {
           </div>
         </div>
       </div>
-      <div style="border-bottom:1px solid #2f3336; padding:15px;">
-        <div style="display:flex; gap:10px;">
-          <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-          <div style="flex:1;">
-            <div style="font-size:15px; color:#fff;"><b>${t.tw_baek}</b> <span style="color:#71767b;">· ${t.tw_bdm_date}</span></div>
-            <div style="margin-top:5px; font-size:15px; color:#fff;">${t.tw_bdm}</div>
-            <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
-              <img src="baek_black.jpg" style="width:100%; display:block;" onerror="this.style.display='none'">
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:12px; color:#71767b; font-size:13px; padding-right:15px;">
-              <span>💬 2.1万</span><span>🔁 1.68万</span>
-              <span style="cursor:pointer;" onclick="triggerLike(this, '6.49万', false)">🤍 6.49万</span>
-              <span>📊 14.5万</span>
-            </div>
-          </div>
-        </div>
+    </div>
+
+    <div id="x-tab-profile" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column; overflow-y:auto; padding-bottom:60px;">
+      <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; border-bottom:1px solid #2f3336;">${t.tw_profile}</div>
+      <div style="height:150px; background:#333; position:relative; cursor:pointer;" onclick="document.getElementById('upload-bg').click()">
+        <img id="user-bg-img" style="width:100%; height:100%; object-fit:cover; display:none;">
+        <div id="user-bg-placeholder" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #1c1c1e, #3a3a3c); color:#888; font-size:12px;">上传背景</div>
+        <input type="file" id="upload-bg" accept="image/*" style="display:none;" onchange="uploadUserImg(this, 'user-bg-img', 'user-bg-placeholder')">
       </div>
-      <div style="border-bottom:1px solid #2f3336; padding:15px;">
-        <div style="display:flex; gap:10px;">
-          <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-          <div style="flex:1;">
-            <div style="font-size:15px; color:#fff;"><b>${t.tw_baek}</b> <span style="color:#71767b;">· ${t.tw_bd_date}</span></div>
-            <div style="margin-top:5px; font-size:15px; color:#fff;">${t.tw_bd_text}</div>
-            <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
-              <img src="baek_plane.jpg" style="width:100%; display:block;" onerror="this.style.display='none'">
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:12px; color:#71767b; font-size:13px; padding-right:15px;">
-              <span>💬 1,204</span><span>🔁 3,186</span>
-              <span style="cursor:pointer;" onclick="triggerLike(this, '9,403', false)">🤍 9,403</span>
-              <span>📊 16.9万</span>
-            </div>
-          </div>
+      <div style="padding: 0 15px; margin-top:-40px; position:relative;">
+        <div style="width:80px; height:80px; border-radius:50%; border:4px solid #000; background:#1d9bf0; display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:bold; color:#fff; position:relative; z-index:10; cursor:pointer;" onclick="document.getElementById('upload-avatar').click()">
+          <img id="user-avatar-img" style="width:100%; height:100%; border-radius:50%; object-fit:cover; display:none;">
+          <div id="user-avatar-placeholder">👤</div>
+          <input type="file" id="upload-avatar" accept="image/*" style="display:none;" onchange="uploadUserImg(this, 'user-avatar-img', 'user-avatar-placeholder')">
         </div>
+        <div style="margin-top:10px;">
+          <div style="font-size:20px; font-weight:bold; outline:none; color:#fff;" contenteditable="true">我的名字</div>
+          <div style="color:#71767b; font-size:15px; outline:none; margin-top:4px;" contenteditable="true">@my_account</div>
+        </div>
+        <div style="margin-top:15px; font-size:15px; outline:none; min-height:20px; color:#fff;" contenteditable="true">点击这里编辑简介...</div>
       </div>
     </div>
 
@@ -138,35 +126,73 @@ function initXApp() {
       <div id="xChoices" style="display:none; flex-direction:column; gap:6px; padding:10px 16px 30px; background:#000;"></div>
     </div>
   `;
+
+  // 恢复自定义上传的图片
+  const savedBg = localStorage.getItem('userBg');
+  if(savedBg) { const img = document.getElementById('user-bg-img'); if(img){ img.src = savedBg; img.style.display = 'block'; document.getElementById('user-bg-placeholder').style.display = 'none'; } }
+  const savedAvatar = localStorage.getItem('userAvatar');
+  if(savedAvatar) { const img = document.getElementById('user-avatar-img'); if(img){ img.src = savedAvatar; img.style.display = 'block'; document.getElementById('user-avatar-placeholder').style.display = 'none'; } }
 }
 
 function switchXTab(tabId) {
-  document.getElementById('x-tab-home').style.display = 'none';
-  document.getElementById('x-tab-baek').style.display = 'none';
-  
+  document.querySelectorAll('.x-tab').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('[id^="x-tab-"]').forEach(el => el.style.display = 'none');
   const target = document.getElementById('x-tab-' + tabId);
   if(target) target.style.display = 'flex';
 
   document.querySelectorAll('svg[id^="nav-"]').forEach(el => el.style.fill = '#71767b');
   if(tabId === 'baek') document.getElementById('nav-home').style.fill = '#fff';
   else { const nav = document.getElementById('nav-' + tabId); if(nav) nav.style.fill = '#fff'; }
+
+  if(tabId === 'notify') document.getElementById('notify-dot').style.display = 'none';
+  if(tabId === 'msg') document.getElementById('msg-dot').style.display = 'none';
 }
 
+function uploadUserImg(input, imgId, placeholderId) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById(placeholderId === 'user-bg-placeholder' ? 'user-bg-img' : 'user-avatar-img');
+      if(img) {
+        img.src = e.target.result; img.style.display = 'block'; 
+        document.getElementById(placeholderId).style.display = 'none';
+        localStorage.setItem(placeholderId === 'user-bg-placeholder' ? 'userBg' : 'userAvatar', e.target.result);
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// 暴力点赞弹出逻辑
 function triggerLike(element, originalCount, isMainTweet) {
   if (element.classList.contains("liked")) return;
   element.classList.add("liked"); element.innerHTML = `❤️ ${originalCount}`; element.style.color = "#f91880";
   
-  if (isMainTweet && !window.hasLiked) {
+  if (isMainTweet) {
     window.hasLiked = true;
     const btnBaek = document.getElementById('like-btn-baek'); if(btnBaek) { btnBaek.innerHTML = `❤️ 8.65万`; btnBaek.style.color = "#f91880"; }
     const btnHome = document.getElementById('like-btn-home'); if(btnHome) { btnHome.innerHTML = `❤️ 8.65万`; btnHome.style.color = "#f91880"; }
     
+    let lang = localStorage.getItem('sysLang') || 'zh-CN';
+    const t = window.trans[lang] || window.trans['zh-CN'];
+
     setTimeout(() => {
-      let lang = localStorage.getItem('sysLang') || 'zh-CN';
-      const t = window.trans[lang];
-      document.getElementById('msg-list-content').innerHTML = `<div onclick="openXChat()" style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px; align-items:center; cursor:pointer;"><img src="avatar.jpg" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:bold;">${t.tw_baek}</span><span style="color:#71767b; font-size:13px;">${t.tw_just_now}</span></div><div style="color:#71767b; font-size:14px; margin-top:2px;">${t.tw_1}</div></div></div>`;
-      document.getElementById('msg-dot').style.display = 'block';
-    }, 1500);
+      // 强塞通知
+      const notifyList = document.getElementById('notify-content');
+      if(notifyList) {
+        notifyList.innerHTML = `<div style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px;"><img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%;"><div><div><b>${t.tw_baek}</b> ${t.tw_follow}</div><div style="color:#71767b; font-size:13px; margin-top:5px;">${t.tw_just_now}</div></div></div>`;
+      }
+      document.getElementById('notify-dot').style.display = 'block';
+      
+      setTimeout(() => {
+        // 强塞私信
+        const msgList = document.getElementById('msg-list-content');
+        if(msgList) {
+          msgList.innerHTML = `<div onclick="openXChat()" style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px; align-items:center; cursor:pointer;"><img src="avatar.jpg" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:bold;">${t.tw_baek}</span><span style="color:#71767b; font-size:13px;">${t.tw_just_now}</span></div><div style="color:#71767b; font-size:14px; margin-top:2px;">${t.tw_1}</div></div></div>`;
+        }
+        document.getElementById('msg-dot').style.display = 'block';
+      }, 800);
+    }, 400);
   }
 }
 
@@ -179,10 +205,8 @@ function closeXChat() { document.getElementById('x-chatroom').style.display = 'n
 
 function startXChat() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
-  const t = window.trans[lang];
-
+  const t = window.trans[lang] || window.trans['zh-CN'];
   const area = document.getElementById("xChatArea"); area.innerHTML = "";
-  const inputBox = document.getElementById("xInputText"); inputBox.style.opacity = "0.5"; inputBox.style.cursor = "default"; inputBox.onclick = null;
   
   addXBubble("them", t.tw_1, false);
   setTimeout(() => {
@@ -197,7 +221,7 @@ function startXChat() {
 
 function addXBubble(from, text, showChoices) {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
-  const t = window.trans[lang];
+  const t = window.trans[lang] || window.trans['zh-CN'];
   
   const area = document.getElementById("xChatArea");
   const row = document.createElement("div");
@@ -217,12 +241,11 @@ function addXBubble(from, text, showChoices) {
 
 function showXChoices() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
-  const t = window.trans[lang];
+  const t = window.trans[lang] || window.trans['zh-CN'];
 
   const inputBox = document.getElementById("xInputText");
   if(inputBox.onclick === null) return; 
-  inputBox.onclick = null; 
-  inputBox.style.opacity = "0.3"; inputBox.textContent = ""; inputBox.style.cursor = "default";
+  inputBox.onclick = null; inputBox.style.opacity = "0.3"; inputBox.textContent = ""; inputBox.style.cursor = "default";
 
   const choicesDiv = document.getElementById("xChoices"); 
   choicesDiv.style.display = "flex"; choicesDiv.innerHTML = "";
@@ -239,17 +262,20 @@ function showXChoices() {
       choicesDiv.style.display = "none"; 
       addXBubble("me", opt.text, false);
       
+      // 修复重复弹出的逻辑
       setTimeout(() => {
-        addXBubble("them", opt.reply, false);
+        addXBubble("them", opt.reply, false); // 这里只弹一次回复（如果是选1，回复半月；选2，回复视频）
+        
         if (opt.text === t.tw_opt1) {
+          // 选1的分支
           setTimeout(() => {
             addXBubble("them", t.tw_meet1, false);
             setTimeout(() => { showCounterAttack(); }, 2000);
           }, 2000);
         } else {
+          // 选2的分支（直接进入小狗选项，不重复发那句话）
           setTimeout(() => {
-            addXBubble("them", t.tw_rep2, false); 
-            setTimeout(() => { showSubChoices(); }, 1500);
+            showSubChoices();
           }, 2000);
         }
       }, 1500);
@@ -260,7 +286,7 @@ function showXChoices() {
 
 function showSubChoices() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
-  const t = window.trans[lang];
+  const t = window.trans[lang] || window.trans['zh-CN'];
 
   document.getElementById("xInputText").style.opacity = "1"; 
   document.getElementById("xInputText").style.cursor = "pointer";
@@ -292,7 +318,7 @@ function showSubChoices() {
 
 function showCounterAttack() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
-  const t = window.trans[lang];
+  const t = window.trans[lang] || window.trans['zh-CN'];
 
   const inputBox = document.getElementById("xInputText");
   inputBox.style.opacity = "1"; inputBox.style.cursor = "pointer";
@@ -321,7 +347,7 @@ function showCounterAttack() {
 
 function showFinalChoices() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
-  const t = window.trans[lang];
+  const t = window.trans[lang] || window.trans['zh-CN'];
 
   const inputBox = document.getElementById("xInputText");
   inputBox.style.opacity = "1"; inputBox.style.cursor = "pointer";

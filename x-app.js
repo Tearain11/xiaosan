@@ -1,6 +1,5 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
-  if (container.innerHTML.trim() !== "") return;
 
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
@@ -166,8 +165,14 @@ function uploadUserImg(input, imgId, placeholderId) {
 // 暴力点赞弹出逻辑
 function triggerLike(element, originalCount, isMainTweet) {
   if (element.classList.contains("liked")) return;
-  element.classList.add("liked"); element.innerHTML = `❤️ ${originalCount}`; element.style.color = "#f91880";
-  
+
+  // 👇 核心修复：只要玩家一点赞，就强行清空旧的 kyoong 记录，防止他提前出来
+  localStorage.removeItem('kyoongUnlockTime');
+  localStorage.removeItem('kyoongUnlocked');
+
+  element.classList.add("liked"); 
+  element.innerHTML = `❤️ ${originalCount}`; 
+  element.style.color = "#f91880"; 
   if (isMainTweet) {
     window.hasLiked = true;
     const btnBaek = document.getElementById('like-btn-baek'); if(btnBaek) { btnBaek.innerHTML = `❤️ 8.65万`; btnBaek.style.color = "#f91880"; }
@@ -356,6 +361,7 @@ function showFinalChoices() {
     
     const choicesDiv = document.getElementById("xChoices"); choicesDiv.style.display = "flex"; choicesDiv.innerHTML = "";
     
+    // 👇 选项1
     const btn1 = document.createElement("button");
     btn1.textContent = t.tw_f_opt1;
     btn1.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer; margin-bottom:5px;";
@@ -368,11 +374,18 @@ function showFinalChoices() {
           addXBubble("them", t.tw_f_rep2, false);
           setTimeout(() => {
             addXBubble("them", t.tw_f_rep3, false);
+            // 👇 选“你在哪”的分支，在这里触发 10 秒后的彩蛋！
+            setTimeout(() => { 
+  localStorage.setItem('kyoongUnlockTime', Date.now()); // 👈 加这一行：记录解锁时间
+  localStorage.removeItem('kyoongCleared');
+  if(typeof triggerKyoongSMS === 'function') triggerKyoongSMS(); 
+}, 10000);
           }, 2000);
         }, 2000);
       }, 1500);
     };
     
+    // 👇 选项2
     const btn2 = document.createElement("button");
     btn2.textContent = t.tw_f_opt2;
     btn2.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer;";
@@ -386,6 +399,8 @@ function showFinalChoices() {
           setTimeout(() => {
             const choicesDiv2 = document.getElementById("xChoices");
             choicesDiv2.style.display = "flex"; choicesDiv2.innerHTML = "";
+            
+            // 👇 选项3（仅此一次）
             const btn3 = document.createElement("button");
             btn3.textContent = t.tw_f_opt3;
             btn3.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer;";
@@ -398,6 +413,11 @@ function showFinalChoices() {
                   addXBubble("them", t.tw_f_rep2, false);
                   setTimeout(() => {
                     addXBubble("them", t.tw_f_rep3, false);
+                    // 👇 选“算了吧” -> “仅此一次”的分支，也在这里触发 10 秒后的彩蛋！
+                    setTimeout(() => { 
+  localStorage.setItem('kyoongUnlockTime', Date.now()); // 👈 加这一行：记录解锁时间
+  if(typeof triggerKyoongSMS === 'function') triggerKyoongSMS(); 
+}, 10000);
                   }, 2000);
                 }, 2000);
               }, 1500);

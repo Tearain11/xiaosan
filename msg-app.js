@@ -30,7 +30,19 @@ function initMsgApp() {
               <span style="font-weight:600; font-size:16px;">${t.msg_boyfriend}</span>
               <span style="font-size:13px; color:#8e8e93;">${t.tw_just_now}</span>
             </div>
-            <div id="msgPreview" style="font-size:14px; color:#8e8e93; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">宝宝抱歉，临时要开会...</div>
+            <div id="msgPreview" style="font-size:14px; color:#8e8e93; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">宝宝，今天下午有空吗？</div>
+          </div>
+        </div>
+
+        <!-- 边伯贤：开场剧情联系人 -->
+        <div id="baekItem" onclick="openBaekChat()" style="display:none; gap:10px; align-items:center; cursor:pointer;">
+          <img src="kyoong.jpg" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+          <div style="flex:1; border-bottom:1px solid #eee; padding-bottom:12px; margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:600; font-size:16px;">边伯贤</span>
+              <span style="font-size:13px; color:#8e8e93;">刚刚</span>
+            </div>
+            <div id="baekPreview" style="font-size:14px; color:#8e8e93; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">所以，姐姐有空嘛？</div>
           </div>
         </div>
 
@@ -64,6 +76,22 @@ function initMsgApp() {
       <div onclick="document.querySelectorAll('.app-page').forEach(s=>s.classList.remove('active'))" style="position:absolute; bottom:0; left:0; right:0; height:30px; z-index:99999; cursor:pointer;"></div>
     </div>
 
+    <!-- 边伯贤开场聊天 -->
+    <div id="baekRoom" style="display:none; position:absolute; inset:0; background:#fff; color:#000; flex-direction:column; z-index:101;">
+      <div style="padding:48px 16px 10px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee;">
+        <span onclick="closeBaekChat()" style="color:#007aff; font-size:16px; cursor:pointer;">‹ 信息</span>
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <img src="kyoong.jpg" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">
+          <span style="font-size:14px; font-weight:600;">边伯贤</span>
+        </div>
+        <span style="width:40px;"></span>
+      </div>
+      <div id="baekArea" style="flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px;"></div>
+      <div style="padding:10px 16px 34px; background:#fff; border-top:1px solid #eee; display:flex; align-items:center;">
+        <div style="flex:1; background:#f2f2f7; border-radius:20px; padding:10px 15px; color:#c7c7cc; font-size:15px;">iMessage</div>
+      </div>
+    </div>
+
     <!-- kyoong 聊天室 -->
     <div id="kyoongRoom" style="display:none; position:absolute; inset:0; background:#fff; color:#000; flex-direction:column; z-index:100;">
       <div style="padding: 48px 16px 10px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee;">
@@ -88,7 +116,7 @@ function initMsgApp() {
     const banner = document.createElement("div");
     banner.id = "lock-msg-banner";
     banner.style.cssText = "position:absolute; top:50%; left:16px; right:16px; background:rgba(50,50,50,0.6); backdrop-filter:blur(25px); border-radius:20px; padding:14px 16px; display:flex; gap:12px; transform:scale(0.9); opacity:0; transition:all 0.4s; z-index:9999; border:1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events:none;";
-    banner.innerHTML = `<div style="width:42px; height:42px; border-radius:8px; background:#8e8e93; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff;">👤</div><div style="flex:1; text-align:left;"><div style="font-size:14px; font-weight:600; color:#fff; display:flex; justify-content:space-between; align-items:center;"><span>信息</span><span style="font-size:12px; color:#aaa;">现在</span></div><div style="font-size:14px; color:#eee; margin-top:4px; line-height:1.3;"><b>${t.msg_boyfriend}</b>：宝宝抱歉，临时要开会...</div></div>`;
+    banner.innerHTML = `<div style="width:42px; height:42px; border-radius:8px; background:#8e8e93; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff;">👤</div><div style="flex:1; text-align:left;"><div style="font-size:14px; font-weight:600; color:#fff; display:flex; justify-content:space-between; align-items:center;"><span>信息</span><span style="font-size:12px; color:#aaa;">现在</span></div><div style="font-size:14px; color:#eee; margin-top:4px; line-height:1.3;"><b>${t.msg_boyfriend}</b>：宝宝，今天下午有空吗？</div></div>`;
     document.getElementById("phone").appendChild(banner);
     
     setTimeout(() => {
@@ -127,20 +155,70 @@ function triggerKyoongSMS() {
 // ================= 男朋友聊天逻辑 =================
 let msgStep = 0;
 
+let openingBoyfriendSequenceStarted = false;
 function openMsgChat() {
   document.getElementById("chatRoom").style.display = "flex";
   document.getElementById("msgPreview").style.color = "#c7c7cc";
   const banner = document.getElementById("lock-msg-banner"); if(banner) banner.style.opacity = "0";
   const dot = document.getElementById("app-msg-dot"); if(dot) dot.style.display = "none";
-
   const chatArea = document.getElementById("chatArea");
-  if (chatArea.innerHTML.trim() === "") {
-    addMsgBubble("them", "宝宝抱歉，临时要开会，今晚的约会去不了了。");
-    msgStep = 1; 
+  if (chatArea.innerHTML.trim() === "" && !openingBoyfriendSequenceStarted) {
+    openingBoyfriendSequenceStarted = true;
+    msgStep = 0;
+    addMsgBubble("them", "宝宝，今天下午有空吗？");
+    document.getElementById("msgPreview").textContent = "宝宝，今天下午有空吗？";
+    setTimeout(() => {
+      addMsgBubble("them", "我想约你出来。");
+      document.getElementById("msgPreview").textContent = "我想约你出来。";
+    }, 1400);
+    setTimeout(() => {
+      addMsgBubble("them", "看到消息回我一下，好不好？");
+      document.getElementById("msgPreview").textContent = "看到消息回我一下，好不好？";
+      localStorage.setItem("openingBoyfriendMessagesDone", "true");
+      showBaekOpeningNotice();
+    }, 2800);
   }
 }
-
 function closeMsgChat() { document.getElementById("chatRoom").style.display = "none"; }
+
+function showBaekOpeningNotice() {
+  const item = document.getElementById("baekItem");
+  const preview = document.getElementById("baekPreview");
+  if (item) item.style.display = "flex";
+  if (preview) preview.textContent = "所以，姐姐有空嘛？";
+  if (localStorage.getItem("baekOpeningNoticeShown") === "true") return;
+  const phone = document.getElementById("phone");
+  if (!phone || document.getElementById("baek-opening-banner")) return;
+  const banner = document.createElement("div");
+  banner.id = "baek-opening-banner";
+  banner.style.cssText = "position:absolute; top:40px; left:16px; right:16px; background:rgba(50,50,50,0.72); backdrop-filter:blur(25px); border-radius:20px; padding:14px 16px; display:flex; gap:12px; transform:translateY(-150%); opacity:0; transition:all 0.4s; z-index:10001; border:1px solid rgba(255,255,255,0.1); box-shadow:0 10px 30px rgba(0,0,0,0.5); pointer-events:none;";
+  banner.innerHTML = '<img src="kyoong.jpg" style="width:42px;height:42px;border-radius:8px;object-fit:cover;"><div style="flex:1;text-align:left;"><div style="font-size:14px;font-weight:600;color:#fff;display:flex;justify-content:space-between;"><span>边伯贤</span><span style="font-size:12px;color:#aaa;">现在</span></div><div style="font-size:14px;color:#eee;margin-top:4px;line-height:1.3;">所以，姐姐有空嘛？</div></div>';
+  phone.appendChild(banner);
+  setTimeout(() => {
+    banner.style.transform = "translateY(0)";
+    banner.style.opacity = "1";
+    localStorage.setItem("baekOpeningNoticeShown", "true");
+    const dot = document.getElementById("app-msg-dot"); if (dot) dot.style.display = "block";
+  }, 150);
+  setTimeout(() => { banner.style.transform = "translateY(-150%)"; banner.style.opacity = "0"; }, 5200);
+}
+function openBaekChat() {
+  const room = document.getElementById("baekRoom");
+  if (room) room.style.display = "flex";
+  const banner = document.getElementById("baek-opening-banner");
+  if (banner) banner.style.opacity = "0";
+  const dot = document.getElementById("app-msg-dot"); if (dot) dot.style.display = "none";
+  const area = document.getElementById("baekArea");
+  if (area && area.innerHTML.trim() === "") addBaekBubble("them", "所以，姐姐有空嘛？");
+}
+function closeBaekChat() { document.getElementById("baekRoom").style.display = "none"; }
+function addBaekBubble(from, text) {
+  const area = document.getElementById("baekArea");
+  const row = document.createElement("div");
+  row.style.cssText = "display:flex;justify-content:flex-start;align-items:flex-end;gap:5px;";
+  row.innerHTML = '<div style="background:#e5e5ea;color:#000;padding:10px 14px;border-radius:18px;font-size:15px;max-width:75%;line-height:1.4;">' + text + '</div><div style="font-size:11px;color:#007aff;margin-bottom:4px;">未读</div>';
+  area.appendChild(row); area.scrollTop = area.scrollHeight;
+}
 
 function addMsgBubble(from, text) {
   const area = document.getElementById("chatArea");

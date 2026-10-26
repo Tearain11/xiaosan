@@ -1,19 +1,4 @@
-// 👇 最暴力的默认语言强制重置（必须放在所有代码的最前面）
-localStorage.setItem('sysLang', 'zh-CN');
-
-// 每次完整加载/刷新网页时重置剧情进度；切换 App 不会重新执行这段代码。
-// 玩家资料、头像、壁纸等设置不在此列表中，因此会继续保留。
-[
-  'kyoongUnlockTime',
-  'kyoongCleared',
-  'xLiked',
-  'xChatHistory',
-  'xChatFinished',
-  'gameDay',
-  'dayOneFinished',
-  'dayOnePromptShown'
-].forEach(key => localStorage.removeItem(key));
-
+// 保留玩家选择的语言、剧情状态与聊天记录；刷新网页时不重置游戏。
 const CONFIG = { wallpaper: "wallpaper.jpg", passcode: "0506" };
 const $ = id => document.getElementById(id);
 
@@ -209,29 +194,29 @@ function initCalendarApp() {
   if (!container) return;
   const year = calendarViewDate.getFullYear();
   const month = calendarViewDate.getMonth();
-  const today = new Date();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const previousMonthDays = new Date(year, month, 0).getDate();
   const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
   let cells = "";
   for (let i = 0; i < 42; i++) {
-    let dateNum, outside = false, dateYear = year, dateMonth = month;
-    if (i < firstDay) {
-      dateNum = previousMonthDays - firstDay + i + 1;
-      outside = true;
-      const prev = new Date(year, month - 1, 1);
-      dateYear = prev.getFullYear(); dateMonth = prev.getMonth();
-    } else if (i >= firstDay + daysInMonth) {
-      dateNum = i - firstDay - daysInMonth + 1;
-      outside = true;
-      const next = new Date(year, month + 1, 1);
-      dateYear = next.getFullYear(); dateMonth = next.getMonth();
-    } else {
-      dateNum = i - firstDay + 1;
-    }
-    const isToday = dateNum === today.getDate() && dateMonth === today.getMonth() && dateYear === today.getFullYear();
-    cells += '<div class="ios-calendar-date' + (outside ? ' outside' : '') + (isToday ? ' today' : '') + '">' + dateNum + '</div>';
+    let dateNum, outside = false;
+    if (i < firstDay) { dateNum = previousMonthDays - firstDay + i + 1; outside = true; }
+    else if (i >= firstDay + daysInMonth) { dateNum = i - firstDay - daysInMonth + 1; outside = true; }
+    else dateNum = i - firstDay + 1;
+    cells += '<div class="ios-calendar-date' + (outside ? ' outside' : '') + '">' + dateNum + '</div>';
+  }
+  const currentDay = getGameDay();
+  const visibleDays = Math.max(3, Math.min(currentDay, 30));
+  let storyDays = "";
+  for (let day = 1; day <= visibleDays; day++) {
+    const completionKey = day === 1 ? "dayOneFinished" : "day" + day + "Finished";
+    const isComplete = localStorage.getItem(completionKey) === "true";
+    storyDays += `<div class="story-day-row">
+      <div class="story-day-icon"><span>${day}</span></div>
+      <div class="story-day-label">第${day}天</div>
+      <div class="story-day-status">${isComplete ? '<span class="story-day-check" aria-label="已完成">✓</span>' : ''}</div>
+    </div>`;
   }
   container.innerHTML = `
     <div class="story-calendar">
@@ -251,8 +236,7 @@ function initCalendarApp() {
         <div class="ios-calendar-weekdays">${weekdays.map(day => '<span>' + day + '</span>').join('')}</div>
         <div class="ios-calendar-grid">${cells}</div>
         <div class="ios-calendar-divider"></div>
-        <div class="ios-calendar-agenda-title">日程</div>
-        <div class="ios-calendar-empty"><span class="ios-calendar-empty-dot"></span><span>没有日程安排</span></div>
+        <div class="story-days-list">${storyDays}</div>
       </div>
     </div>`;
 }
@@ -263,8 +247,80 @@ function changeCalendarMonth(offset) {
 document.addEventListener("click", e => { if(e.target.closest("[data-home]")) goHome(); });
 
 
+
+const GAME_SAVE_PREFIX = "gameSaveSlot_";
+const GAME_AUTO_SAVE_KEY = "gameAutoSave";
+const SETTINGS_KEYS = new Set(["sysLang", "userName", "userAvatar", "userBg"]);
+function getGameSnapshot() {
+  const snapshot = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || SETTINGS_KEYS.has(key) || key === GAME_AUTO_SAVE_KEY || key.startsWith(GAME_SAVE_PREFIX)) continue;
+    snapshot[key] = localStorage.getItem(key);
+  }
+  return snapshot;
+}
+function applyGameSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== "object") return;
+  const remove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && !SETTINGS_KEYS.has(key) && key !== GAME_AUTO_SAVE_KEY && !key.startsWith(GAME_SAVE_PREFIX)) remove.push(key);
+  }
+  remove.forEach(key => localStorage.removeItem(key));
+  Object.entries(snapshot).forEach(([key, value]) => {
+    if (!SETTINGS_KEYS.has(key) && key !== GAME_AUTO_SAVE_KEY && !key.startsWith(GAME_SAVE_PREFIX)) localStorage.setItem(key, value);
+  });
+}
+function saveGameAuto() {
+  try { localStorage.setItem(GAME_AUTO_SAVE_KEY, JSON.stringify({ savedAt: Date.now(), data: getGameSnapshot() })); }
+  catch (error) { console.warn("自动存档失败", error); }
+}
+function restoreGameAuto() {
+  try {
+    const raw = localStorage.getItem(GAME_AUTO_SAVE_KEY);
+    if (!raw) return;
+    const save = JSON.parse(raw);
+    if (save && save.data) applyGameSnapshot(save.data);
+  } catch (error) { console.warn("自动存档读取失败", error); }
+}
+window.addEventListener("pagehide", saveGameAuto);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") saveGameAuto(); });
+function saveGameSlot(slot) {
+  try {
+    localStorage.setItem(GAME_SAVE_PREFIX + slot, JSON.stringify({ savedAt: Date.now(), data: getGameSnapshot() }));
+    const status = document.getElementById("game-save-status");
+    if (status) status.textContent = "存档位 " + slot + " 已保存";
+    renderGameSaveSlots();
+  } catch (error) { alert("存档失败，可能是浏览器可用空间不足。"); }
+}
+function loadGameSlot(slot) {
+  const raw = localStorage.getItem(GAME_SAVE_PREFIX + slot);
+  if (!raw) { alert("这个存档位还是空的。"); return; }
+  if (!confirm("读取存档会替换当前游戏进度，确定继续吗？")) return;
+  try {
+    const record = JSON.parse(raw);
+    applyGameSnapshot(record.data);
+    saveGameAuto();
+    location.reload();
+  } catch (error) { alert("这个存档无法读取。"); }
+}
+function renderGameSaveSlots() {
+  document.querySelectorAll("[data-save-slot]").forEach(button => {
+    const slot = button.getAttribute("data-save-slot");
+    const label = button.querySelector(".game-save-slot-state");
+    if (!label) return;
+    const raw = localStorage.getItem(GAME_SAVE_PREFIX + slot);
+    if (!raw) { label.textContent = "空存档位"; return; }
+    try { label.textContent = "已保存 · " + new Date(JSON.parse(raw).savedAt).toLocaleString(); }
+    catch { label.textContent = "存档数据异常"; }
+  });
+}
+
 function init(){
+  restoreGameAuto();
   applyWallpaper(); updateClock(); setInterval(updateClock, 10000);
+  setInterval(saveGameAuto, 5000);
   renderApps(); renderWidgets();forceGlobalHomebar(); updateGlobalLanguage();
 }
 document.addEventListener("DOMContentLoaded", init);

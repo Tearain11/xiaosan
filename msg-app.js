@@ -5,8 +5,10 @@ function initMsgApp() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
 
-  // 只有剧情正式触发后才显示 kyoong；不使用旧时间戳，避免刷新后提前出现。
-  const isKyoongUnlocked = localStorage.getItem('kyoongCleared') === 'true';
+  // 只有当前存档确实进入第二天后才显示 kyoong，避免新存档沿用旧的解锁标记。
+  const isKyoongUnlocked = localStorage.getItem('kyoongCleared') === 'true'
+    && (parseInt(localStorage.getItem('gameDay') || '1', 10) >= 2)
+    && localStorage.getItem('dayOneFinished') === 'true';
 
   container.innerHTML = `
     <div style="display:flex; flex-direction:column; height:100%; background:#fff; color:#000;">

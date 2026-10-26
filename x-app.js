@@ -378,6 +378,7 @@ function showFinalChoices() {
             setTimeout(() => { 
   localStorage.setItem('kyoongUnlockTime', Date.now()); // 👈 加这一行：记录解锁时间
   localStorage.removeItem('kyoongCleared');
+  localStorage.removeItem('kyoongHasChatted');
   if(typeof triggerKyoongSMS === 'function') triggerKyoongSMS(); 
 }, 10000);
           }, 2000);

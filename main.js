@@ -112,19 +112,9 @@ function checkPin() {
 }
 
 window.addEventListener("load", () => {
+  // 开场锁屏只显示男朋友的消息预览，不再额外弹出 X 通知。
   const xBanner = $("lock-banner");
-  if (xBanner && localStorage.getItem("xLockNoticeShown") !== "true") {
-    setTimeout(() => {
-      if (localStorage.getItem("xLockNoticeShown") === "true") return;
-      if (xBanner && !$("lock").classList.contains("unlocked")) {
-        xBanner.style.top = "35%";
-        xBanner.classList.add("show");
-        localStorage.setItem("xLockNoticeShown", "true");
-      }
-    }, 200);
-  } else if (xBanner) {
-    xBanner.classList.remove("show");
-  }
+  if (xBanner) xBanner.classList.remove("show");
   renderWidgets();
   updateGlobalLanguage();
   if (typeof initMsgApp === "function") initMsgApp();

@@ -68,9 +68,16 @@ function updateGlobalLanguage() {
 }
 
 let currentPin = "";
-function showPasscode() { 
-  $("lock-main").classList.add("passcode-active"); $("passcode-screen").classList.add("active"); 
-  $("lock-banner").classList.remove("show"); const msgBanner = $("lock-msg-banner"); if(msgBanner) msgBanner.style.opacity = "0";
+function showPasscode() {
+  currentPin = "";
+  updateDots();
+  $("passcode-error").classList.remove("show");
+  $("lock-main").classList.add("passcode-active");
+  $("passcode-screen").classList.add("active");
+  $("lock-banner").classList.remove("show");
+  const msgBanner = $("lock-msg-banner"); if(msgBanner) msgBanner.style.opacity = "0";
+  const kyoongBanner = $("kyoong-banner");
+  if(kyoongBanner) { kyoongBanner.style.opacity = "0"; kyoongBanner.style.transform = "translateY(-150%)"; }
 }
 let startY = null;
 const lockScreen = $("lock");

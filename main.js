@@ -296,7 +296,10 @@ function applyGameSnapshot(snapshot) {
     if (!SETTINGS_KEYS.has(key) && key !== GAME_AUTO_SAVE_KEY && !key.startsWith(GAME_SAVE_PREFIX)) localStorage.setItem(key, value);
   });
 }
+let skipAutoSaveOnUnload = false;
 function saveGameAuto() {
+  // 读档刷新时，旧页面的 pagehide/visibilitychange 不能再把当前较新的进度写回自动存档。
+  if (skipAutoSaveOnUnload) return;
   try { localStorage.setItem(GAME_AUTO_SAVE_KEY, JSON.stringify({ savedAt: Date.now(), data: getGameSnapshot() })); }
   catch (error) { console.warn("自动存档失败", error); }
 }
@@ -334,6 +337,8 @@ function loadGameSlot(slot) {
     applyGameSnapshot(record.data);
     // 让刷新后的页面直接进入已解锁的主屏幕。
     sessionStorage.setItem("gameLoadReturnHome", "true");
+    // 阻止 location.reload() 触发的旧页面 pagehide 自动保存覆盖刚读入的存档。
+    skipAutoSaveOnUnload = true;
     location.reload();
   } catch (error) { alert("这个存档无法读取。"); }
 }

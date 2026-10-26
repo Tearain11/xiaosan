@@ -221,10 +221,29 @@ function triggerKyoongOptions() {
       const replies = ['我知道了姐姐。', '对不起，是我不该这样逾越。', '是我太贪心了。', '我不会再打扰你了，姐姐。', '祝你幸福。'];
       replies.forEach((line, i) => setTimeout(() => { addKyoongBubble('them', line); if (i === replies.length - 1) setTimeout(showKyoongEnding, 700); }, 1000 * (i + 1))); kyoongStep = 0;
     });
-    addChoice('其实……我想了很久。从答应和你见面的那一刻起，我就一直在想这件事。', () => {
-      const heroine = ['其实……我想了很久。', '从答应和你见面的那一刻起，我就一直在想这件事。', '我知道自己有男朋友，昨天答应见面的时候，也知道这意味着什么。', '但是我现在想好了。', '如果你不介意的话，我们以后还可以像昨天那样见面吗？', '我没办法和你谈恋爱，这个很抱歉。', '只是……如果你也愿意的话，我们可以暂时维持现在这样的关系。'];
-      const replies = ['姐姐真的想好了？', '我还以为，姐姐会让我以后都不要再找你了。', '不过，既然是姐姐主动说的……', '那我当然愿意啊。'];
-      heroine.forEach((line, i) => setTimeout(() => addKyoongBubble('me', line), 700 * (i + 1))); replies.forEach((line, i) => setTimeout(() => addKyoongBubble('them', line), 700 * (heroine.length + i + 1))); kyoongStep = 0;
+    addChoice('其实……我想了很久。', () => {
+      addKyoongBubble('me', '其实……我想了很久。');
+      kyoongStep = 6;
+    });
+  } else if (kyoongStep >= 6 && kyoongStep <= 11) {
+    const heroineLines = {
+      6: '从答应和你见面的那一刻起，我就一直在想这件事。',
+      7: '我知道自己有男朋友，昨天答应见面的时候，也知道这意味着什么。',
+      8: '但是我现在想好了。',
+      9: '如果你不介意的话，我们以后还可以像昨天那样见面吗？',
+      10: '我没办法和你谈恋爱，这个很抱歉。',
+      11: '只是……如果你也愿意的话，我们可以暂时维持现在这样的关系。'
+    };
+    const line = heroineLines[kyoongStep];
+    addChoice(line, () => {
+      addKyoongBubble('me', line);
+      if (kyoongStep < 11) {
+        kyoongStep += 1;
+      } else {
+        kyoongStep = 0;
+        const replies = ['姐姐真的想好了？', '我还以为，姐姐会让我以后都不要再找你了。', '不过，既然是姐姐主动说的……', '那我当然愿意啊。'];
+        replies.forEach((reply, i) => setTimeout(() => addKyoongBubble('them', reply), 1000 * (i + 1)));
+      }
     });
   }
 }

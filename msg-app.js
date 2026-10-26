@@ -6,11 +6,9 @@ function initMsgApp() {
   const t = window.trans[lang] || window.trans['zh-CN'];
 
   // 时间锁
-  let unlockTime = parseInt(localStorage.getItem('kyoongUnlockTime') || '0');
-  let isKyoongUnlocked = false;
-  if (unlockTime > 0 && (Date.now() - unlockTime < 3600000)) {
-    isKyoongUnlocked = true;
-  }
+  // 剧情解锁持续保存，不因等待超过一小时或刷新而消失。
+  let isKyoongUnlocked = localStorage.getItem('kyoongUnlocked') === 'true'
+    || parseInt(localStorage.getItem('kyoongUnlockTime') || '0') > 0;
 
   container.innerHTML = `
     <div style="display:flex; flex-direction:column; height:100%; background:#fff; color:#000;">
@@ -103,7 +101,8 @@ function initMsgApp() {
 
 function triggerKyoongSMS() {
   localStorage.setItem('kyoongCleared', 'true');
-  localStorage.setItem('kyoongUnlockTime', Date.now());
+  localStorage.setItem('kyoongUnlocked', 'true');
+  localStorage.setItem('kyoongUnlockTime', String(Date.now()));
   const item = document.getElementById('kyoongItem'); if (item) item.style.display = 'flex';
   const dot = document.getElementById('app-msg-dot'); if(dot) dot.style.display = 'block';
   if (!document.getElementById("kyoong-banner")) {
@@ -127,15 +126,27 @@ function openMsgChat() {
   const dot = document.getElementById("app-msg-dot"); if(dot) dot.style.display = "none";
 
   const chatArea = document.getElementById("chatArea");
+  const saved = JSON.parse(localStorage.getItem("boyfriendChatHistory") || "[]");
   if (chatArea.innerHTML.trim() === "") {
-    addMsgBubble("them", "宝宝抱歉，临时要开会，今晚的约会去不了了。");
-    msgStep = 1; 
+    if (saved.length) {
+      saved.forEach(item => addMsgBubble(item.from, item.text, false));
+      msgStep = parseInt(localStorage.getItem("boyfriendMsgStep") || "0", 10);
+    } else {
+      addMsgBubble("them", "宝宝抱歉，临时要开会，今晚的约会去不了了。");
+      msgStep = 1;
+      localStorage.setItem("boyfriendMsgStep", "1");
+    }
   }
 }
 
 function closeMsgChat() { document.getElementById("chatRoom").style.display = "none"; }
 
-function addMsgBubble(from, text) {
+function addMsgBubble(from, text, save = true) {
+  if (save) {
+    const history = JSON.parse(localStorage.getItem("boyfriendChatHistory") || "[]");
+    history.push({ from, text });
+    localStorage.setItem("boyfriendChatHistory", JSON.stringify(history));
+  }
   const area = document.getElementById("chatArea");
   const row = document.createElement("div");
   row.style.display = "flex"; row.style.justifyContent = from === "them" ? "flex-start" : "flex-end"; row.style.alignItems = "flex-end"; row.style.gap = "5px";
@@ -167,12 +178,13 @@ function triggerMsgOptions() {
 
 function chooseMsg(text, nextStep) {
   document.getElementById("msgOptions").style.display = "none";
-  msgStep = 0; 
+  msgStep = 0;
+  localStorage.setItem("boyfriendMsgStep", "0");
   if (text !== '（已读不回）') addMsgBubble("me", text);
   if (nextStep === 2) {
-    setTimeout(() => { addMsgBubble("them", "宝宝别闹了，领导在催了，我先去忙了。"); msgStep = 2; }, 1200);
+    setTimeout(() => { addMsgBubble("them", "宝宝别闹了，领导在催了，我先去忙了。"); msgStep = 2; localStorage.setItem("boyfriendMsgStep", "2"); }, 1200);
   } else if (nextStep === 3) {
-    setTimeout(() => { addMsgBubble("them", "下次我一定补偿你，早点睡。"); }, 1200);
+    setTimeout(() => { addMsgBubble("them", "下次我一定补偿你，早点睡。"); localStorage.setItem("boyfriendMsgStep", "3"); }, 1200);
   }
 }
 

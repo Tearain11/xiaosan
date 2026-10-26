@@ -57,10 +57,20 @@
   <!-- 设置 App 挂载点 -->
   <div class="app-page" id="app-settings"><div id="settingsAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div></div>
 
-  <script src="main.js"></script>
-  <script src="msg-app.js"></script>
-  <script src="x-app.js"></script>
-  <script src="settings.js"></script>
+  <!-- 每次整页加载先清除本轮剧情存档；仅切换 App 不会重新执行此段。 -->
+  <script>
+    (function () {
+      [
+        "xChatHistory", "xChatFinished", "xChatRead", "xLiked",
+        "kyoongUnlocked", "kyoongUnlockTime", "kyoongCleared",
+        "boyfriendChatHistory", "boyfriendMsgStep"
+      ].forEach(function (key) { localStorage.removeItem(key); });
+    })();
+  </script>
+  <script src="main.js?v=20261026-reset1"></script>
+  <script src="msg-app.js?v=20261026-reset1"></script>
+  <script src="x-app.js?v=20261026-reset1"></script>
+  <script src="settings.js?v=20261026-reset1"></script>
 </div>
 </body>
 </html>

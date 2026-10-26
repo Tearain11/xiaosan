@@ -157,33 +157,27 @@ function openApp(id) {
   const el = $("app-" + id);
   if(el) {
     el.classList.add("active");
+    const homebar = $("app-homebar"); if (homebar) homebar.style.display = "block";
     if (id === "x") { $("lock-banner").classList.remove("show"); if (typeof initXApp === "function") initXApp(); }
     if (id === "msg") { const msgBanner = $("lock-msg-banner"); if(msgBanner) msgBanner.style.opacity = "0"; if (typeof initMsgApp === "function") initMsgApp(); }
     if (id === "settings" && typeof initSettingsApp === "function") initSettingsApp();
   }
 }
 
-function goHome() { document.querySelectorAll(".app-page").forEach(s => s.classList.remove("active")); }
+function goHome() {
+  document.querySelectorAll(".app-page").forEach(s => s.classList.remove("active"));
+  const bar = $("app-homebar"); if (bar) bar.style.display = "none";
+}
 document.addEventListener("click", e => { if(e.target.closest("[data-home]")) goHome(); });
 
 
 function init(){
   applyWallpaper(); updateClock(); setInterval(updateClock, 10000);
-  renderApps(); renderWidgets();forceGlobalHomebar(); updateGlobalLanguage();
-}
-document.addEventListener("DOMContentLoaded", init);
-// 👇 终极物理外挂：全局底部隐形热区，绝对不被任何 App 遮挡
-function forceGlobalHomebar() {
-  if(!document.getElementById("global-homebar")) {
+  renderApps(); renderWidgets(); updateGlobalLanguage();
+  if (!$("app-homebar")) {
     const bar = document.createElement("div");
-    bar.id = "global-homebar";
-    // 高度 25px，完全透明，固定在屏幕最底层，层级拉到最高
-    bar.style.cssText = "position:fixed !important; bottom:0 !important; left:0 !important; right:0 !important; height:25px !important; z-index:2147483647 !important; cursor:pointer !important;";
-    bar.onclick = function(e) { 
-      e.preventDefault(); 
-      e.stopPropagation(); 
-      goHome(); 
-    };
-    document.getElementById("phone").appendChild(bar);
+    bar.id = "app-homebar"; bar.setAttribute("role", "button"); bar.setAttribute("aria-label", "返回主屏幕");
+    bar.addEventListener("click", goHome); $("phone").appendChild(bar);
   }
 }
+document.addEventListener("DOMContentLoaded", init);

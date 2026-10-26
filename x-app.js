@@ -277,7 +277,7 @@ function addXBubble(from, text, showChoices) {
   row.style.alignSelf = from === "them" ? "flex-start" : "flex-end";
   row.style.flexDirection = from === "them" ? "row" : "row-reverse";
   const timeText = `${t.tw_just_now} · <span style="color:#71767b;">${t.unread}</span>`;
-  row.innerHTML = `<div><div style="padding:12px 16px; border-radius:20px; font-size:15px; line-height:1.4; background:${from === "them" ? "#2f3336" : "#1d9bf0}; color:#fff; border-bottom-${from === "them" ? "left" : "right"}-radius:4px;">${text}</div><div class="x-message-meta" data-status="unread" style="font-size:11px; color:#71767b; display:flex; justify-content:${from === "them" ? "flex-start" : "flex-end"}; margin-top:4px; gap:4px;">${timeText}</div></div>`;
+  row.innerHTML = `<div><div style="padding:12px 16px; border-radius:20px; font-size:15px; line-height:1.4; background:${from === "them" ? "#2f3336" : "#1d9bf0"}; color:#fff; border-bottom-${from === "them" ? "left" : "right"}-radius:4px;">${text}</div><div class="x-message-meta" data-status="unread" style="font-size:11px; color:#71767b; display:flex; justify-content:${from === "them" ? "flex-start" : "flex-end"}; margin-top:4px; gap:4px;">${timeText}</div></div>`;
   area.appendChild(row);
   area.scrollTop = area.scrollHeight;
 

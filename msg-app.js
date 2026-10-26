@@ -216,7 +216,7 @@ function openKyoongChat() {
   document.getElementById('kyoongRoom').style.display = 'flex'; markKyoongAsRead();
   const banner = document.getElementById('kyoong-banner'); if (banner) banner.style.opacity = '0';
   const area = document.getElementById('kyoongArea');
-  if (area.innerHTML.trim() === '') {
+  if (area.innerHTML.trim() === '' && localStorage.getItem('dayTwoInviteSequenceStarted') !== 'true') {
     addKyoongBubble('them', '姐姐，醒了吗？');
     setTimeout(() => addKyoongBubble('them', '明明才分开几个小时，可是我好想你哦。'), 1000);
     setTimeout(() => addKyoongBubble('them', '看样子没醒啊.....T T'), 11000);

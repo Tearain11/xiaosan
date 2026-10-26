@@ -168,7 +168,18 @@ function goHome() { document.querySelectorAll(".app-page").forEach(s => s.classL
 document.addEventListener("click", e => { if(e.target.closest("[data-home]")) goHome(); });
 
 
+// 每次完整加载网站时开启新一轮游戏：清除剧情进度，但保留语言和玩家自定义资料。
+function resetGameProgressOnPageLoad() {
+  [
+    "xChatHistory", "xChatFinished", "xChatRead", "xLiked",
+    "kyoongUnlocked", "kyoongUnlockTime", "kyoongCleared",
+    "boyfriendChatHistory", "boyfriendMsgStep"
+  ].forEach(key => localStorage.removeItem(key));
+  window.hasLiked = false;
+}
+
 function init(){
+  resetGameProgressOnPageLoad();
   applyWallpaper(); updateClock(); setInterval(updateClock, 10000);
   renderApps(); renderWidgets();forceGlobalHomebar(); updateGlobalLanguage();
 }

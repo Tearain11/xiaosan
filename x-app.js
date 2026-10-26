@@ -247,12 +247,8 @@ function startXChat() {
   
   addXBubble("them", t.tw_1, false);
   setTimeout(() => {
-    const unreadMeta = document.getElementById("last-meta");
-    if(unreadMeta) unreadMeta.innerHTML = `${t.tw_just_now} · <span style="color:#71767b;">${t.read}</span>`;
-    setTimeout(() => {
-      addXBubble("them", t.tw_2, false);
-      setTimeout(() => { addXBubble("them", t.tw_3, true); }, 1500);
-    }, 1500);
+    addXBubble("them", t.tw_2, false);
+    setTimeout(() => { addXBubble("them", t.tw_3, true); }, 1500);
   }, 2000);
 }
 
@@ -260,21 +256,40 @@ function addXBubble(from, text, showChoices) {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
   const area = document.getElementById("xChatArea");
+
+  // 新消息来自另一方时，将此前对方发出的未读消息统一改为已读。
+  area.querySelectorAll("[data-sender]").forEach(message => {
+    if (message.dataset.sender !== from) {
+      const meta = message.querySelector(".x-message-meta");
+      if (meta && meta.dataset.status === "unread") {
+        meta.innerHTML = `${t.tw_just_now} · <span style="color:#71767b;">${t.read}</span>`;
+        meta.dataset.status = "read";
+      }
+    }
+  });
+
   const row = document.createElement("div");
-  row.style.display = "flex"; row.style.gap = "10px"; row.style.maxWidth = "85%"; row.style.alignItems = "flex-end";
-  row.style.alignSelf = from === "them" ? "flex-start" : "flex-end"; row.style.flexDirection = from === "them" ? "row" : "row-reverse";
-  const timeText = from === "them" ? `${t.tw_just_now} · <span style='color:#71767b;'>${t.unread}</span>` : `${t.tw_just_now} · ${t.read}`;
-  row.innerHTML = `<div><div style="padding:12px 16px; border-radius:20px; font-size:15px; line-height:1.4; background:${from === 'them' ? '#2f3336' : '#1d9bf0'}; color:#fff; border-bottom-${from === 'them' ? 'left' : 'right'}-radius:4px;">${text}</div><div ${from === "them" ? 'id="last-meta"' : ''} style="font-size:11px; color:#71767b; display:flex; justify-content:${from === 'them' ? 'flex-start' : 'flex-end'}; margin-top:4px; gap:4px;">${timeText}</div></div>`;
-  area.appendChild(row); area.scrollTop = area.scrollHeight;
-  
+  row.dataset.sender = from;
+  row.style.display = "flex";
+  row.style.gap = "10px";
+  row.style.maxWidth = "85%";
+  row.style.alignItems = "flex-end";
+  row.style.alignSelf = from === "them" ? "flex-start" : "flex-end";
+  row.style.flexDirection = from === "them" ? "row" : "row-reverse";
+  const timeText = `${t.tw_just_now} · <span style="color:#71767b;">${t.unread}</span>`;
+  row.innerHTML = `<div><div style="padding:12px 16px; border-radius:20px; font-size:15px; line-height:1.4; background:${from === "them" ? "#2f3336" : "#1d9bf0}; color:#fff; border-bottom-${from === "them" ? "left" : "right"}-radius:4px;">${text}</div><div class="x-message-meta" data-status="unread" style="font-size:11px; color:#71767b; display:flex; justify-content:${from === "them" ? "flex-start" : "flex-end"}; margin-top:4px; gap:4px;">${timeText}</div></div>`;
+  area.appendChild(row);
+  area.scrollTop = area.scrollHeight;
+
   if (showChoices) {
     setTimeout(() => {
       const inputBox = document.getElementById("xInputText");
-      inputBox.style.opacity = "1"; inputBox.style.cursor = "pointer"; inputBox.onclick = showXChoices;
+      inputBox.style.opacity = "1";
+      inputBox.style.cursor = "pointer";
+      inputBox.onclick = showXChoices;
     }, 500);
   }
 }
-
 function showXChoices() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];

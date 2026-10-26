@@ -237,11 +237,134 @@ function triggerKyoongOptions() {
         kyoongStep += 1;
       } else {
         kyoongStep = 0;
-        const replies = ['姐姐真的想好了？', '我还以为，姐姐会让我以后都不要再找你了。', '不过，既然是姐姐主动说的……', '那我当然愿意啊。'];
-        replies.forEach((reply, i) => setTimeout(() => addKyoongBubble('them', reply), 1000 * (i + 1)));
+        const replies = [
+          '姐姐真的想好了？',
+          '我还以为，姐姐会狠心不要我了呢.....',
+          '这种事，我当然愿意，无论什么身份，你愿意给我一个能在你身边的机会。',
+          '我就已经很知足了。',
+          '不过，随意弃狗可是很严重的。',
+          '所以姐姐，不要后悔，我是不会轻易放你走的。'
+        ];
+        replies.forEach((reply, i) => setTimeout(() => {
+          addKyoongBubble('them', reply);
+          if (i === replies.length - 1) {
+            kyoongStep = 12;
+            setTimeout(() => {
+              const opts = document.getElementById('kyoongOptions');
+              if (opts) {
+                opts.style.display = 'flex';
+                opts.innerHTML = '';
+                const btn = document.createElement('button');
+                btn.textContent = '这种事才不是开玩笑的呢';
+                btn.style.cssText = 'padding:12px;border-radius:12px;border:1px solid #007aff;background:#fff;color:#007aff;font-size:14px;text-align:left;line-height:1.45;';
+                btn.onclick = () => {
+                  opts.style.display = 'none';
+                  addKyoongBubble('me', '这种事才不是开玩笑的呢');
+                  kyoongStep = 0;
+                  setTimeout(() => addKyoongBubble('them', '那姐姐下午要不要出来见一面？'), 900);
+                  setTimeout(() => addKyoongBubble('them', '我本来还想再等等的，毕竟刚才说了那些话。'), 1900);
+                  setTimeout(() => {
+                    addKyoongBubble('them', '可是想了想，喜欢见姐姐这件事，好像也没什么好藏着的。');
+                    setTimeout(showDayTwoInvite, 900);
+                  }, 2900);
+                };
+                opts.appendChild(btn);
+              }
+            }, 500);
+          }
+        }, 1000 * (i + 1)));
       }
     });
   }
+}
+function showDayTwoInvite() {
+  if (document.getElementById('day-two-invite-overlay')) return;
+  const phone = document.getElementById('phone');
+  const overlay = document.createElement('div');
+  overlay.id = 'day-two-invite-overlay';
+  overlay.style.cssText = 'position:absolute;inset:0;z-index:100001;background:rgba(0,0,0,.28);display:flex;align-items:flex-start;justify-content:center;padding:48px 12px 20px;box-sizing:border-box;overflow:auto;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:420px;background:#f7f7fb;border-radius:24px;padding:16px;box-sizing:border-box;color:#1c1c1e;box-shadow:0 12px 36px rgba(0,0,0,.2);">
+      <div style="font-size:11px;letter-spacing:1.5px;color:#8e8e93;margin-bottom:12px;">MESSAGES · 第二天</div>
+      <div style="background:rgba(255,255,255,.95);border-radius:18px;padding:12px 14px;margin-bottom:10px;">
+        <div style="font-size:12px;color:#8e8e93;margin-bottom:5px;">通知预览 · 男朋友</div>
+        <div style="font-size:15px;font-weight:600;">宝宝，今天下午有空吗</div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:14px;margin-bottom:10px;font-size:14px;line-height:1.75;">
+        <div style="font-weight:600;margin-bottom:7px;">男朋友</div>
+        宝宝，今天下午有空吗？<br><br>
+        昨天是我不好，不应该把你一个人晾在那里。<br><br>
+        这几天一直忙着自己的事，都没怎么好好陪你。<br><br>
+        所以今天下午留给我，好不好？<br><br>
+        带你去吃你之前收藏了很久的那家餐厅，吃完再陪你逛街。上次你看中的东西不是还没买吗？这次不许再说不要了。<br><br>
+        就当是我给你赔罪。<br><br>
+        宝宝，给我一个机会，好不好？
+      </div>
+      <div style="background:rgba(255,255,255,.95);border-radius:18px;padding:12px 14px;margin-bottom:14px;">
+        <div style="font-size:12px;color:#8e8e93;margin-bottom:5px;">新消息预览 · 边伯贤</div>
+        <div style="font-size:15px;font-weight:600;">姐姐，那我等你回复哦。</div>
+      </div>
+      <div style="font-size:16px;font-weight:700;margin:4px 0 10px;">选择要发送的回复</div>
+      <div style="font-size:13px;color:#8e8e93;margin-bottom:8px;">男朋友</div>
+      <div id="day2-boyfriend-options" style="display:grid;gap:7px;margin-bottom:14px;">
+        <button data-choice="boyfriend-yes" style="padding:12px;border:1px solid #007aff;border-radius:13px;background:#fff;color:#007aff;text-align:left;">好吧，那你下午来接我。</button>
+        <button data-choice="boyfriend-no" style="padding:12px;border:1px solid #007aff;border-radius:13px;background:#fff;color:#007aff;text-align:left;">今天就算了，我还有别的安排。</button>
+      </div>
+      <div style="font-size:13px;color:#8e8e93;margin-bottom:8px;">边伯贤</div>
+      <div id="day2-baek-options" style="display:grid;gap:7px;margin-bottom:12px;">
+        <button data-choice="baek-yes" style="padding:12px;border:1px solid #007aff;border-radius:13px;background:#fff;color:#007aff;text-align:left;">好呀，那待会儿见。</button>
+        <button data-choice="baek-no" style="padding:12px;border:1px solid #007aff;border-radius:13px;background:#fff;color:#007aff;text-align:left;">今天不行，下次再说吧。</button>
+      </div>
+      <div id="day2-choice-status" style="font-size:12px;color:#8e8e93;margin-bottom:10px;">两边的回复互斥：答应一方后，另一方自动拒绝。</div>
+      <button id="day2-confirm" disabled style="width:100%;padding:13px;border:0;border-radius:14px;background:#007aff;color:white;font-size:15px;opacity:.45;">发送消息，继续剧情</button>
+    </div>`;
+  phone.appendChild(overlay);
+  let choice = '';
+  const boyOptions = overlay.querySelector('#day2-boyfriend-options');
+  const baekOptions = overlay.querySelector('#day2-baek-options');
+  const confirm = overlay.querySelector('#day2-confirm');
+  const paint = () => {
+    boyOptions.querySelectorAll('button').forEach(btn => {
+      const yes = choice === 'boyfriend-yes';
+      const selected = btn.dataset.choice === choice || (yes && btn.dataset.choice === 'baek-no') || (choice === 'boyfriend-no' && btn.dataset.choice === 'baek-yes') || (choice === 'baek-yes' && btn.dataset.choice === 'boyfriend-no') || (choice === 'baek-no' && btn.dataset.choice === 'boyfriend-yes');
+      btn.style.background = selected ? '#e5efff' : '#fff';
+      btn.style.fontWeight = selected ? '600' : '400';
+      btn.disabled = !!choice && btn.dataset.choice !== choice && !(
+        (choice === 'boyfriend-yes' && btn.dataset.choice === 'baek-no') ||
+        (choice === 'boyfriend-no' && btn.dataset.choice === 'baek-yes') ||
+        (choice === 'baek-yes' && btn.dataset.choice === 'boyfriend-no') ||
+        (choice === 'baek-no' && btn.dataset.choice === 'boyfriend-yes')
+      );
+    });
+    baekOptions.querySelectorAll('button').forEach(btn => {
+      const selected = btn.dataset.choice === choice || (choice === 'boyfriend-yes' && btn.dataset.choice === 'baek-no') || (choice === 'boyfriend-no' && btn.dataset.choice === 'baek-yes') || (choice === 'baek-yes' && btn.dataset.choice === 'boyfriend-no') || (choice === 'baek-no' && btn.dataset.choice === 'boyfriend-yes');
+      btn.style.background = selected ? '#e5efff' : '#fff';
+      btn.style.fontWeight = selected ? '600' : '400';
+      btn.disabled = !!choice && !selected;
+    });
+    confirm.disabled = !choice;
+    confirm.style.opacity = choice ? '1' : '.45';
+  };
+  overlay.querySelectorAll('[data-choice]').forEach(btn => btn.addEventListener('click', () => {
+    if (choice) return;
+    choice = btn.dataset.choice;
+    paint();
+  }));
+  confirm.addEventListener('click', () => {
+    if (!choice) return;
+    const response = {
+      'boyfriend-yes': ['好吧，那你下午来接我。', '今天不行，下次再说吧。'],
+      'boyfriend-no': ['今天就算了，我还有别的安排。', '好呀，那待会儿见。'],
+      'baek-yes': ['今天就算了，我还有别的安排。', '好呀，那待会儿见。'],
+      'baek-no': ['好吧，那你下午来接我。', '今天不行，下次再说吧。']
+    }[choice];
+    overlay.remove();
+    addKyoongBubble('me', response[1]);
+    localStorage.setItem('dayTwoInviteChoice', choice);
+    localStorage.setItem('dayTwoFinished', 'true');
+    const transition = document.getElementById('day-transition');
+    if (transition) transition.style.display = 'flex';
+  });
 }
 function showKyoongEnding() {
   // 任意路线抵达结局时，标记当天剧情完成；不向日历泄露具体结局内容。

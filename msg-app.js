@@ -119,6 +119,13 @@ function initMsgApp() {
   }
 }
 
+function saveStoryProgressNow() {
+  const boyfriendArea = document.getElementById('chatArea'), baekArea = document.getElementById('kyoongArea');
+  if (boyfriendArea) localStorage.setItem('storyChat_boyfriend', boyfriendArea.innerHTML);
+  if (baekArea) localStorage.setItem('storyChat_baek', baekArea.innerHTML);
+  if (typeof msgStep !== 'undefined') localStorage.setItem('storyStep_boyfriend', String(msgStep || 0));
+  if (typeof kyoongStep !== 'undefined') localStorage.setItem('storyStep_baek', String(kyoongStep || 0));
+}
 function triggerKyoongSMS() {
   localStorage.setItem('kyoongCleared', 'true');
   localStorage.setItem('kyoongUnlockTime', Date.now());
@@ -139,18 +146,23 @@ function triggerKyoongSMS() {
 let msgStep = 0;
 
 function openMsgChat() {
-  document.getElementById("chatRoom").style.display = "flex";
-  document.getElementById("msgPreview").style.color = "#c7c7cc";
-  const banner = document.getElementById("lock-msg-banner"); if(banner) banner.style.opacity = "0";
-  const dot = document.getElementById("app-msg-dot"); if(dot) dot.style.display = "none";
-
-  const chatArea = document.getElementById("chatArea");
-  if (chatArea.innerHTML.trim() === "") {
-    addMsgBubble("them", "宝宝抱歉，临时要开会，今晚的约会去不了了。");
-    msgStep = 1; 
+  document.getElementById('chatRoom').style.display = 'flex';
+  document.getElementById('msgPreview').style.color = '#c7c7cc';
+  const banner = document.getElementById('lock-msg-banner'); if (banner) banner.style.opacity = '0';
+  const dot = document.getElementById('app-msg-dot'); if (dot) dot.style.display = 'none';
+  const area = document.getElementById('chatArea');
+  // 只有玩家主动点进男朋友聊天框，才把第二天的七条完整邀约放进聊天记录。
+  if (localStorage.getItem('dayTwoBoyfriendNoticeSent') === 'true' && localStorage.getItem('dayTwoBoyfriendChatOpened') !== 'true') {
+    localStorage.setItem('dayTwoBoyfriendChatOpened', 'true'); area.innerHTML = '';
+    ['宝宝，今天下午有空吗？','昨天是我不好，不应该把你一个人晾在那里。','这几天一直忙着自己的事，都没怎么好好陪你。','所以今天下午留给我，好不好？','带你去吃你之前收藏了很久的那家餐厅，吃完再陪你逛街。上次你看中的东西不是还没买吗？这次不许再说不要了。','就当是我给你赔罪。','宝宝，给我一个机会，好不好？'].forEach(line => addMsgBubble('them', line));
+    localStorage.setItem('dayTwoBoyfriendChatFinished', 'true');
+    if (typeof showDayTwoBaekNotification === 'function') setTimeout(showDayTwoBaekNotification, 650);
+  } else if (area.innerHTML.trim() === '') {
+    addMsgBubble('them', '宝宝抱歉，临时要开会，今晚的约会去不了了。'); msgStep = 1;
   }
+  if (localStorage.getItem('dayTwoBaekNoticeSent') === 'true') renderDayTwoBoyfriendChoices();
+  saveStoryProgressNow();
 }
-
 function closeMsgChat() { document.getElementById("chatRoom").style.display = "none"; }
 
 function addMsgBubble(from, text) {
@@ -162,7 +174,7 @@ function addMsgBubble(from, text) {
   } else {
     row.innerHTML = `<div style="font-size:11px; color:#8e8e93; margin-bottom:4px;">已读</div><div style="background:#007aff; color:#fff; padding:10px 14px; border-radius:18px; font-size:15px; max-width:75%; line-height:1.4;">${text}</div>`;
   }
-  area.appendChild(row); area.scrollTop = area.scrollHeight;
+  area.appendChild(row); area.scrollTop = area.scrollHeight; if (typeof saveStoryProgressNow === 'function') saveStoryProgressNow();
 }
 
 function triggerMsgOptions() {

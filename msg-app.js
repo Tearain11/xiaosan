@@ -300,116 +300,72 @@ function triggerKyoongOptions() {
   }
 }
 function showDayTwoInvite() {
-  // 第二天·双重邀约：严格按剧情顺序推进，所有选择都等两边邀约完整出现后再开放。
+  // 前面三条邀约已在上一段剧情中发送，这里只弹男朋友通知，绝不重复添加聊天气泡。
   if (localStorage.getItem('dayTwoInviteSequenceStarted') === 'true') return;
   localStorage.setItem('dayTwoInviteSequenceStarted', 'true');
-
-  const phone = document.getElementById('phone');
-  const showStoryNotification = (id, sender, message, avatarHtml, onDone) => {
-    const old = document.getElementById(id);
-    if (old) old.remove();
-    const banner = document.createElement('div');
-    banner.id = id;
-    banner.style.cssText = 'position:absolute;top:48px;left:16px;right:16px;background:rgba(45,45,48,.88);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:12px 14px;display:flex;gap:10px;align-items:center;z-index:100001;box-shadow:0 8px 24px rgba(0,0,0,.22);color:#fff;opacity:0;transform:translateY(-12px);transition:all .28s;';
-    banner.innerHTML = avatarHtml + '<div style="min-width:0;flex:1;"><div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#ddd;margin-bottom:4px;"><b style="font-size:13px;color:#fff;">' + sender + '</b><span>刚刚</span></div><div style="font-size:14px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + message + '</div></div>';
-    phone.appendChild(banner);
-    requestAnimationFrame(() => { banner.style.opacity = '1'; banner.style.transform = 'translateY(0)'; });
-    setTimeout(() => {
-      banner.style.opacity = '0';
-      banner.style.transform = 'translateY(-12px)';
-      setTimeout(() => { banner.remove(); if (onDone) onDone(); }, 320);
-    }, 2400);
-  };
-
-  const boyfriendArea = document.getElementById('chatArea');
-  const kyoongArea = document.getElementById('kyoongArea');
-  const boyfriendPreview = document.getElementById('msgPreview');
-  const baekPreview = document.getElementById('kyoongPreview');
+  localStorage.setItem('dayTwoInviteStage', 'boyfriend-notification');
   const avatar = '<div style="width:40px;height:40px;flex:0 0 40px;border-radius:10px;background:#8e8e93;display:flex;align-items:center;justify-content:center;font-size:20px;">👤</div>';
-  const baekAvatar = '<img src="kyoong.jpg" style="width:40px;height:40px;flex:0 0 40px;border-radius:10px;object-fit:cover;">';
+  showDayTwoNotification('day-two-boyfriend-notice', '男朋友', '宝宝，今天下午有空吗', avatar, () => {
+    localStorage.setItem('dayTwoBoyfriendNoticeSent', 'true');
+    const preview = document.getElementById('msgPreview');
+    if (preview) preview.textContent = '宝宝，今天下午有空吗？';
+    saveStoryProgressNow();
+  });
+}
 
-  // 第 1 段：边伯贤的邀约已经发出，但暂不显示任何回复选项。
-  if (kyoongArea && !kyoongArea.dataset.dayTwoInviteAdded) {
-    kyoongArea.dataset.dayTwoInviteAdded = 'true';
-    addKyoongBubble('them', '那姐姐下午要不要出来见一面？');
-    setTimeout(() => addKyoongBubble('them', '我本来还想再等等的，毕竟刚才说了那些话。'), 900);
-    setTimeout(() => {
-      addKyoongBubble('them', '可是想了想，喜欢见姐姐这件事，好像也没什么好藏着的。');
-      if (baekPreview) baekPreview.textContent = '可是想了想，喜欢见姐姐这件事，好像也没什么好藏着的。';
-      // 第 2 段：顶部只显示男朋友的通知预览。
-      setTimeout(() => showStoryNotification('day-two-boyfriend-notice', '男朋友', '宝宝，今天下午有空吗', avatar, () => {
-        // 第 3 段：打开男朋友聊天框，显示完整邀约内容。
-        openMsgChat();
-        const area = document.getElementById('chatArea');
-        if (area && !area.dataset.dayTwoFullInviteAdded) {
-          area.dataset.dayTwoFullInviteAdded = 'true';
-          addMsgBubble('them', '宝宝，今天下午有空吗？');
-          addMsgBubble('them', '昨天是我不好，不应该把你一个人晾在那里。');
-          addMsgBubble('them', '这几天一直忙着自己的事，都没怎么好好陪你。');
-          addMsgBubble('them', '所以今天下午留给我，好不好？');
-          addMsgBubble('them', '带你去吃你之前收藏了很久的那家餐厅，吃完再陪你逛街。上次你看中的东西不是还没买吗？这次不许再说不要了。');
-          addMsgBubble('them', '就当是我给你赔罪。');
-          addMsgBubble('them', '宝宝，给我一个机会，好不好？');
-        }
-        if (boyfriendPreview) boyfriendPreview.textContent = '宝宝，给我一个机会，好不好？';
-        // 第 4 段：男朋友发完后，再弹出边伯贤独立的新消息预览。
-        setTimeout(() => showStoryNotification('day-two-baek-notice', '边伯贤', '所以，姐姐下午有空嘛？', baekAvatar, () => {
-          addKyoongBubble('them', '姐姐，那我等你回复哦。');
-          if (baekPreview) baekPreview.textContent = '姐姐，那我等你回复哦。';
-          // 两边都发完后才开放四个具体回复。为让两边选项同时可见，切回边伯贤聊天框展示选择面板。
-          closeMsgChat();
-          openKyoongChat();
-          const opts = document.getElementById('kyoongOptions');
-          if (!opts) return;
-          opts.style.display = 'flex';
-          opts.style.flexDirection = 'column';
-          opts.innerHTML = '<div style="font-size:13px;font-weight:700;color:#555;padding:2px 4px;">男朋友</div>';
-          const addChoice = (label, handler) => {
-            const btn = document.createElement('button');
-            btn.textContent = label;
-            btn.style.cssText = 'padding:12px;border-radius:12px;border:1px solid #007aff;background:#fff;color:#007aff;font-size:14px;text-align:left;line-height:1.45;';
-            btn.onclick = () => { opts.style.display = 'none'; handler(); };
-            opts.appendChild(btn);
-          };
-          addChoice('好吧，那你下午来接我。', () => finishDayTwoInvite('boyfriend', true));
-          addChoice('今天就算了，我还有别的安排。', () => finishDayTwoInvite('boyfriend', false));
-          const divider = document.createElement('div');
-          divider.style.cssText = 'font-size:13px;font-weight:700;color:#555;padding:8px 4px 2px;border-top:1px solid #ddd;margin-top:4px;';
-          divider.textContent = '边伯贤';
-          opts.appendChild(divider);
-          addChoice('好呀，那待会儿见。', () => finishDayTwoInvite('baek', true));
-          addChoice('今天不行，下次再说吧。', () => finishDayTwoInvite('baek', false));
-        }), 500);
-      }), 800);
-    }, 1900);
-  }
+function showDayTwoNotification(id, sender, message, avatarHtml, onDone) {
+  const phone = document.getElementById('phone');
+  const old = document.getElementById(id); if (old) old.remove();
+  const banner = document.createElement('div'); banner.id = id;
+  banner.style.cssText = 'position:absolute;top:48px;left:16px;right:16px;background:rgba(45,45,48,.88);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:12px 14px;display:flex;gap:10px;align-items:center;z-index:100001;box-shadow:0 8px 24px rgba(0,0,0,.22);color:#fff;opacity:0;transform:translateY(-12px);transition:all .28s;';
+  banner.innerHTML = avatarHtml + '<div style="min-width:0;flex:1;"><div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#ddd;margin-bottom:4px;"><b style="font-size:13px;color:#fff;">' + sender + '</b><span>刚刚</span></div><div style="font-size:14px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + message + '</div></div>';
+  phone.appendChild(banner); requestAnimationFrame(() => { banner.style.opacity = '1'; banner.style.transform = 'translateY(0)'; });
+  setTimeout(() => { banner.style.opacity = '0'; banner.style.transform = 'translateY(-12px)'; setTimeout(() => { banner.remove(); if (onDone) onDone(); }, 320); }, 2400);
+}
+
+function showDayTwoBaekNotification() {
+  if (localStorage.getItem('dayTwoBoyfriendChatFinished') !== 'true' || localStorage.getItem('dayTwoBaekNoticeSent') === 'true') return;
+  const avatar = '<img src="kyoong.jpg" style="width:40px;height:40px;flex:0 0 40px;border-radius:10px;object-fit:cover;">';
+  showDayTwoNotification('day-two-baek-notice', '边伯贤', '所以，姐姐下午有空嘛？', avatar, () => {
+    localStorage.setItem('dayTwoBaekNoticeSent', 'true'); localStorage.setItem('dayTwoInviteStage', 'choices-ready');
+    const area = document.getElementById('kyoongArea');
+    if (area && !area.innerText.includes('姐姐，那我等你回复哦。')) addKyoongBubble('them', '姐姐，那我等你回复哦。');
+    const preview = document.getElementById('kyoongPreview'); if (preview) preview.textContent = '姐姐，那我等你回复哦。';
+    renderDayTwoBoyfriendChoices(); renderDayTwoBaekChoices(); saveStoryProgressNow();
+  });
+}
+
+function renderDayTwoBoyfriendChoices() {
+  if (localStorage.getItem('dayTwoBaekNoticeSent') !== 'true' || localStorage.getItem('dayTwoInviteChoice')) return;
+  const opts = document.getElementById('msgOptions'); if (!opts) return; opts.style.display = 'flex'; opts.innerHTML = '';
+  [['好吧，那你下午来接我。', true], ['今天就算了，我还有别的安排。', false]].forEach(([label, yes]) => {
+    const btn = document.createElement('button'); btn.textContent = label;
+    btn.style.cssText = 'padding:12px;border-radius:12px;border:1px solid #007aff;background:#fff;color:#007aff;font-size:14px;text-align:left;line-height:1.45;';
+    btn.onclick = () => finishDayTwoInvite('boyfriend', yes); opts.appendChild(btn);
+  });
+}
+
+function renderDayTwoBaekChoices() {
+  if (localStorage.getItem('dayTwoBaekNoticeSent') !== 'true' || localStorage.getItem('dayTwoInviteChoice')) return;
+  const opts = document.getElementById('kyoongOptions'); if (!opts) return; opts.style.display = 'flex'; opts.innerHTML = '';
+  [['好呀，那待会儿见。', true], ['今天不行，下次再说吧。', false]].forEach(([label, yes]) => {
+    const btn = document.createElement('button'); btn.textContent = label;
+    btn.style.cssText = 'padding:12px;border-radius:12px;border:1px solid #007aff;background:#fff;color:#007aff;font-size:14px;text-align:left;line-height:1.45;';
+    btn.onclick = () => finishDayTwoInvite('baek', yes); opts.appendChild(btn);
+  });
 }
 
 function finishDayTwoInvite(chosenPerson, agrees) {
-  const opts = document.getElementById('kyoongOptions');
-  if (opts) opts.style.display = 'none';
-  const boyfriendArea = document.getElementById('chatArea');
-  const baekArea = document.getElementById('kyoongArea');
-
-  // 两边必须一边同意、一边拒绝；不能同时答应或同时拒绝。
+  if (localStorage.getItem('dayTwoInviteChoice')) return;
   const boyfriendAgrees = chosenPerson === 'boyfriend' ? agrees : !agrees;
   const baekAgrees = chosenPerson === 'baek' ? agrees : !agrees;
-
-  if (boyfriendArea && !boyfriendArea.dataset.dayTwoReplyAdded) {
-    boyfriendArea.dataset.dayTwoReplyAdded = 'true';
-    addMsgBubble('me', boyfriendAgrees ? '好吧，那你下午来接我。' : '今天就算了，我还有别的安排。');
-  }
-  if (baekArea && !baekArea.dataset.dayTwoReplyAdded) {
-    baekArea.dataset.dayTwoReplyAdded = 'true';
-    addKyoongBubble('me', baekAgrees ? '好呀，那待会儿见。' : '今天不行，下次再说吧。');
-  }
-
+  const boyfriendArea = document.getElementById('chatArea'), baekArea = document.getElementById('kyoongArea');
+  ['msgOptions','kyoongOptions'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  if (boyfriendArea && !boyfriendArea.dataset.dayTwoReplyAdded) { boyfriendArea.dataset.dayTwoReplyAdded = 'true'; addMsgBubble('me', boyfriendAgrees ? '好吧，那你下午来接我。' : '今天就算了，我还有别的安排。'); }
+  if (baekArea && !baekArea.dataset.dayTwoReplyAdded) { baekArea.dataset.dayTwoReplyAdded = 'true'; addKyoongBubble('me', baekAgrees ? '好呀，那待会儿见。' : '今天不行，下次再说吧。'); }
   localStorage.setItem('dayTwoInviteChoice', boyfriendAgrees ? 'boyfriend-yes' : 'baek-yes');
-  localStorage.setItem('dayTwoFinished', 'true');
-  localStorage.setItem('dayTwoInviteSequenceStarted', 'true');
-  localStorage.setItem('dayTwoInviteSequenceFinished', 'true');
-  kyoongStep = 0;
-  msgStep = 0;
+  localStorage.setItem('dayTwoFinished', 'true'); localStorage.setItem('dayTwoInviteSequenceFinished', 'true'); localStorage.setItem('dayTwoInviteStage', 'finished');
+  kyoongStep = 0; msgStep = 0; saveStoryProgressNow();
 }
 function showKyoongEnding() {
   // 结局一：到此为止。保留独立结局画面，并提供重新开始选项。

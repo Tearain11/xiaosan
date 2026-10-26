@@ -84,6 +84,26 @@ function initMsgApp() {
     </div>
   `;
 
+  // 恢复上次离开时的聊天现场和剧情步骤，刷新后不从头重播。
+  const savedBoyfriendChat = localStorage.getItem('storyChat_boyfriend');
+  const savedBaekChat = localStorage.getItem('storyChat_baek');
+  const savedMsgStep = localStorage.getItem('storyStep_boyfriend');
+  const savedKyoongStep = localStorage.getItem('storyStep_baek');
+  if (savedBoyfriendChat) document.getElementById('chatArea').innerHTML = savedBoyfriendChat;
+  if (savedBaekChat) document.getElementById('kyoongArea').innerHTML = savedBaekChat;
+  if (savedMsgStep !== null) msgStep = parseInt(savedMsgStep, 10) || 0;
+  if (savedKyoongStep !== null) kyoongStep = parseInt(savedKyoongStep, 10) || 0;
+  if (!window.storyProgressSaveTimer) {
+    window.storyProgressSaveTimer = setInterval(() => {
+      const boyfriendArea = document.getElementById('chatArea');
+      const baekArea = document.getElementById('kyoongArea');
+      if (boyfriendArea) localStorage.setItem('storyChat_boyfriend', boyfriendArea.innerHTML);
+      if (baekArea) localStorage.setItem('storyChat_baek', baekArea.innerHTML);
+      localStorage.setItem('storyStep_boyfriend', String(msgStep || 0));
+      localStorage.setItem('storyStep_baek', String(kyoongStep || 0));
+    }, 500);
+  }
+
   if (!document.getElementById("lock-msg-banner")) {
     const banner = document.createElement("div");
     banner.id = "lock-msg-banner";

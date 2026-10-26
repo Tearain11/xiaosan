@@ -1,16 +1,16 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
-  // 每次重新进入 X 都重置本次测试用的主推文点赞状态，确保能重新触发剧情。
-  // 即使页面 DOM 仍被保留，也要清除旧按钮的 liked 样式。
+  // 每次进入 X 时重置主推文点赞状态；避免旧 DOM / CSS 把剧情触发按钮锁住。
+  localStorage.removeItem("xLiked");
+  window.hasLiked = false;
   if (container.innerHTML.trim() !== "") {
-    localStorage.removeItem("xLiked");
-    window.hasLiked = false;
     ["like-btn-home", "like-btn-baek"].forEach(id => {
       const btn = document.getElementById(id);
       if (btn) {
         btn.classList.remove("liked");
         btn.style.color = "#71767b";
         btn.innerHTML = "🤍 8.65万";
+        btn.onclick = function () { triggerLike(this, "8.65万", true); };
       }
     });
     return;

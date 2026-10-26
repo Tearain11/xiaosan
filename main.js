@@ -112,9 +112,13 @@ function checkPin() {
 }
 
 window.addEventListener("load", () => {
-  // 开场锁屏只显示男朋友的消息预览，不再额外弹出 X 通知。
+  // 保留原本边伯贤的 X 推文锁屏通知；男朋友剧情在信息 App 内逐条展开。
   const xBanner = $("lock-banner");
-  if (xBanner) xBanner.classList.remove("show");
+  if (xBanner && !$("lock").classList.contains("unlocked")) {
+    setTimeout(() => {
+      if (!$("lock").classList.contains("unlocked")) xBanner.classList.add("show");
+    }, 700);
+  }
   renderWidgets();
   updateGlobalLanguage();
   if (typeof initMsgApp === "function") initMsgApp();

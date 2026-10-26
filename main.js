@@ -203,42 +203,62 @@ function enterNextDay() {
   if (typeof triggerKyoongSMS === "function") triggerKyoongSMS();
 }
 
+let calendarViewDate = new Date();
 function initCalendarApp() {
   const container = document.getElementById("calendarAppContent");
   if (!container) return;
-  const day = getGameDay();
-  const dayOneFinished = localStorage.getItem("dayOneFinished") === "true";
-  const dayTwoUnlocked = day >= 2;
+  const year = calendarViewDate.getFullYear();
+  const month = calendarViewDate.getMonth();
+  const today = new Date();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const previousMonthDays = new Date(year, month, 0).getDate();
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  let cells = "";
+  for (let i = 0; i < 42; i++) {
+    let dateNum, outside = false, dateYear = year, dateMonth = month;
+    if (i < firstDay) {
+      dateNum = previousMonthDays - firstDay + i + 1;
+      outside = true;
+      const prev = new Date(year, month - 1, 1);
+      dateYear = prev.getFullYear(); dateMonth = prev.getMonth();
+    } else if (i >= firstDay + daysInMonth) {
+      dateNum = i - firstDay - daysInMonth + 1;
+      outside = true;
+      const next = new Date(year, month + 1, 1);
+      dateYear = next.getFullYear(); dateMonth = next.getMonth();
+    } else {
+      dateNum = i - firstDay + 1;
+    }
+    const isToday = dateNum === today.getDate() && dateMonth === today.getMonth() && dateYear === today.getFullYear();
+    cells += '<div class="ios-calendar-date' + (outside ? ' outside' : '') + (isToday ? ' today' : '') + '">' + dateNum + '</div>';
+  }
   container.innerHTML = `
     <div class="story-calendar">
       <div class="story-calendar-header">
-        <span onclick="goHome()" class="story-calendar-back">‹ 桌面</span>
+        <span onclick="goHome()" class="story-calendar-back">‹</span>
         <div class="story-calendar-title">日历</div>
         <span class="story-calendar-spacer"></span>
       </div>
-      <div class="story-calendar-body">
-        <div class="story-calendar-eyebrow">STORY CALENDAR</div>
-        <h2>剧情日程</h2>
-        <p class="story-calendar-subtitle">记录故事走到哪里，不显示现实日期。</p>
-        <div class="story-day-card current">
-          <div class="story-day-number">DAY 01</div>
-          <div class="story-day-copy">
-            <strong>第一天</strong>
-            <span>${dayOneFinished ? "推特剧情已完成" : "正在进行中"}</span>
+      <div class="ios-calendar-content">
+        <div class="ios-calendar-month">
+          <strong>${year}年${month + 1}月</strong>
+          <div class="ios-calendar-arrows">
+            <button onclick="changeCalendarMonth(-1)" aria-label="上个月">‹</button>
+            <button onclick="changeCalendarMonth(1)" aria-label="下个月">›</button>
           </div>
-          <span class="story-day-state">${dayOneFinished ? "✓" : "进行中"}</span>
         </div>
-        <div class="story-day-card ${dayTwoUnlocked ? "current" : "locked"}">
-          <div class="story-day-number">DAY 02</div>
-          <div class="story-day-copy">
-            <strong>第二天</strong>
-            <span>${dayTwoUnlocked ? "新消息已解锁" : "完成第一天剧情后解锁"}</span>
-          </div>
-          <span class="story-day-state">${dayTwoUnlocked ? "✓" : "🔒"}</span>
-        </div>
-        <div class="story-calendar-note">日历只记录进度；进入下一天需要在跨日提示中点击确认。</div>
+        <div class="ios-calendar-weekdays">${weekdays.map(day => '<span>' + day + '</span>').join('')}</div>
+        <div class="ios-calendar-grid">${cells}</div>
+        <div class="ios-calendar-divider"></div>
+        <div class="ios-calendar-agenda-title">日程</div>
+        <div class="ios-calendar-empty"><span class="ios-calendar-empty-dot"></span><span>没有日程安排</span></div>
       </div>
     </div>`;
+}
+function changeCalendarMonth(offset) {
+  calendarViewDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() + offset, 1);
+  initCalendarApp();
 }
 document.addEventListener("click", e => { if(e.target.closest("[data-home]")) goHome(); });
 

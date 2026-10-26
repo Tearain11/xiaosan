@@ -53,6 +53,17 @@
 
   <div class="app-page" id="app-msg"><div id="msgAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div></div>
   <div class="app-page dark" id="app-x"><div id="xAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div></div>
+  <div class="app-page" id="app-calendar"><div id="calendarAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div></div>
+  <div id="day-transition" aria-modal="true" role="dialog">
+    <div class="day-transition-card">
+      <div class="day-transition-icon">▦</div>
+      <div class="day-transition-kicker">STORY CONTINUES</div>
+      <div class="day-transition-title">新的一天</div>
+      <div class="day-transition-description">昨夜的故事已经结束。今天，还有新的消息等待你。</div>
+      <button class="day-transition-button" onclick="enterNextDay()">进入第二天</button>
+      <div class="day-transition-footnote">点击继续 · 剧情将从今天开始</div>
+    </div>
+  </div>
  
   <!-- 设置 App 挂载点 -->
   <div class="app-page" id="app-settings"><div id="settingsAppContent" style="width:100%; height:100%; position:relative; overflow:hidden;"></div></div>

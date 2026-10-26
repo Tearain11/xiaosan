@@ -8,7 +8,10 @@ localStorage.setItem('sysLang', 'zh-CN');
   'kyoongCleared',
   'xLiked',
   'xChatHistory',
-  'xChatFinished'
+  'xChatFinished',
+  'gameDay',
+  'dayOneFinished',
+  'dayOnePromptShown'
 ].forEach(key => localStorage.removeItem(key));
 
 const CONFIG = { wallpaper: "wallpaper.jpg", passcode: "0506" };
@@ -142,7 +145,7 @@ const DOCK_APPS = [
   { id:"music", name:"", html:`<img src="icon_music.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` }
 ];
 
-const OPENABLE = new Set(["x", "msg", "settings"]);
+const OPENABLE = new Set(["x", "msg", "settings", "calendar"]);
 function createAppHTML(a) { 
   if(a.id === "msg") {
     return `<div class="app" data-app="${a.id}" style="position:relative;">
@@ -172,10 +175,71 @@ function openApp(id) {
     if (id === "x") { $("lock-banner").classList.remove("show"); if (typeof initXApp === "function") initXApp(); }
     if (id === "msg") { const msgBanner = $("lock-msg-banner"); if(msgBanner) msgBanner.style.opacity = "0"; if (typeof initMsgApp === "function") initMsgApp(); }
     if (id === "settings" && typeof initSettingsApp === "function") initSettingsApp();
+    if (id === "calendar" && typeof initCalendarApp === "function") initCalendarApp();
   }
 }
 
-function goHome() { document.querySelectorAll(".app-page").forEach(s => s.classList.remove("active")); }
+function goHome() {
+  document.querySelectorAll(".app-page").forEach(s => s.classList.remove("active"));
+  maybeShowDayTransition();
+}
+
+function getGameDay() {
+  return parseInt(localStorage.getItem("gameDay") || "1", 10) || 1;
+}
+
+function maybeShowDayTransition() {
+  if (getGameDay() !== 1 || localStorage.getItem("dayOneFinished") !== "true") return;
+  const modal = document.getElementById("day-transition");
+  if (modal) modal.classList.add("show");
+}
+
+function enterNextDay() {
+  if (localStorage.getItem("dayOneFinished") !== "true") return;
+  localStorage.setItem("gameDay", "2");
+  localStorage.setItem("dayOnePromptShown", "true");
+  const modal = document.getElementById("day-transition");
+  if (modal) modal.classList.remove("show");
+  if (typeof triggerKyoongSMS === "function") triggerKyoongSMS();
+}
+
+function initCalendarApp() {
+  const container = document.getElementById("calendarAppContent");
+  if (!container) return;
+  const day = getGameDay();
+  const dayOneFinished = localStorage.getItem("dayOneFinished") === "true";
+  const dayTwoUnlocked = day >= 2;
+  container.innerHTML = `
+    <div class="story-calendar">
+      <div class="story-calendar-header">
+        <span onclick="goHome()" class="story-calendar-back">‹ 桌面</span>
+        <div class="story-calendar-title">日历</div>
+        <span class="story-calendar-spacer"></span>
+      </div>
+      <div class="story-calendar-body">
+        <div class="story-calendar-eyebrow">STORY CALENDAR</div>
+        <h2>剧情日程</h2>
+        <p class="story-calendar-subtitle">记录故事走到哪里，不显示现实日期。</p>
+        <div class="story-day-card current">
+          <div class="story-day-number">DAY 01</div>
+          <div class="story-day-copy">
+            <strong>第一天</strong>
+            <span>${dayOneFinished ? "推特剧情已完成" : "正在进行中"}</span>
+          </div>
+          <span class="story-day-state">${dayOneFinished ? "✓" : "进行中"}</span>
+        </div>
+        <div class="story-day-card ${dayTwoUnlocked ? "current" : "locked"}">
+          <div class="story-day-number">DAY 02</div>
+          <div class="story-day-copy">
+            <strong>第二天</strong>
+            <span>${dayTwoUnlocked ? "新消息已解锁" : "完成第一天剧情后解锁"}</span>
+          </div>
+          <span class="story-day-state">${dayTwoUnlocked ? "✓" : "🔒"}</span>
+        </div>
+        <div class="story-calendar-note">日历只记录进度；进入下一天需要在跨日提示中点击确认。</div>
+      </div>
+    </div>`;
+}
 document.addEventListener("click", e => { if(e.target.closest("[data-home]")) goHome(); });
 
 

@@ -362,9 +362,7 @@ function showFinalChoices() {
           addXBubble("them", t.tw_f_rep2, false);
           setTimeout(() => {
             addXBubble("them", t.tw_f_rep3, false);
-            localStorage.setItem('kyoongUnlockTime', Date.now());
-            localStorage.removeItem('kyoongCleared');
-            setTimeout(() => { if(typeof triggerKyoongSMS === 'function') triggerKyoongSMS(); }, 10000);
+            localStorage.setItem('dayOneFinished', 'true');
           }, 2000);
         }, 2000);
       }, 1500);
@@ -391,9 +389,7 @@ function showFinalChoices() {
                   addXBubble("them", t.tw_f_rep2, false);
                   setTimeout(() => {
                     addXBubble("them", t.tw_f_rep3, false);
-                    localStorage.setItem('kyoongUnlockTime', Date.now());
-                    localStorage.removeItem('kyoongCleared');
-                    setTimeout(() => { if(typeof triggerKyoongSMS === 'function') triggerKyoongSMS(); }, 10000);
+                    localStorage.setItem('dayOneFinished', 'true');
                   }, 2000);
                 }, 2000);
               }, 1500);

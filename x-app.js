@@ -309,7 +309,8 @@ function showXChoices() {
         if (opt.text === t.tw_opt1) {
           setTimeout(() => { addXBubble("them", t.tw_meet1, false); setTimeout(() => { showCounterAttack(); }, 2000); }, 2000);
         } else {
-          setTimeout(() => { addXBubble("them", t.tw_rep2, false); setTimeout(() => { showSubChoices(); }, 1500); }, 2000);
+          // “脸长得不错，仅此而已”对应的“那视频呢？”已由 opt.reply 发出，不能重复发送。
+          setTimeout(() => { showSubChoices(); }, 2000);
         }
       }, 1500);
     };

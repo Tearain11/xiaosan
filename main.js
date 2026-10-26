@@ -308,7 +308,7 @@ function loadGameSlot(slot) {
 function renderGameSaveSlots() {
   document.querySelectorAll("[data-save-slot]").forEach(button => {
     const slot = button.getAttribute("data-save-slot");
-    const label = button.querySelector(".game-save-slot-state");
+    const label = button.parentElement.querySelector(".game-save-slot-state");
     if (!label) return;
     const raw = localStorage.getItem(GAME_SAVE_PREFIX + slot);
     if (!raw) { label.textContent = "空存档位"; return; }

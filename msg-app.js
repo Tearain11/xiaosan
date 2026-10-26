@@ -84,16 +84,19 @@ function initMsgApp() {
     </div>
   `;
 
-  if (!document.getElementById("lock-msg-banner")) {
+  if (!document.getElementById("lock-msg-banner") && localStorage.getItem("boyfriendLockNoticeShown") !== "true") {
     const banner = document.createElement("div");
     banner.id = "lock-msg-banner";
     banner.style.cssText = "position:absolute; top:50%; left:16px; right:16px; background:rgba(50,50,50,0.6); backdrop-filter:blur(25px); border-radius:20px; padding:14px 16px; display:flex; gap:12px; transform:scale(0.9); opacity:0; transition:all 0.4s; z-index:9999; border:1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events:none;";
     banner.innerHTML = `<div style="width:42px; height:42px; border-radius:8px; background:#8e8e93; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff;">👤</div><div style="flex:1; text-align:left;"><div style="font-size:14px; font-weight:600; color:#fff; display:flex; justify-content:space-between; align-items:center;"><span>信息</span><span style="font-size:12px; color:#aaa;">现在</span></div><div style="font-size:14px; color:#eee; margin-top:4px; line-height:1.3;"><b>${t.msg_boyfriend}</b>：宝宝抱歉，临时要开会...</div></div>`;
     document.getElementById("phone").appendChild(banner);
     
-    setTimeout(() => { 
-      if(document.getElementById("lock").classList.contains("unlocked")) return;
-      banner.style.transform = "scale(1)"; banner.style.opacity = "1"; 
+    setTimeout(() => {
+      if (document.getElementById("lock").classList.contains("unlocked")) return;
+      if (localStorage.getItem("boyfriendLockNoticeShown") === "true") { banner.remove(); return; }
+      banner.style.transform = "scale(1)";
+      banner.style.opacity = "1";
+      localStorage.setItem("boyfriendLockNoticeShown", "true");
       const dot = document.getElementById("app-msg-dot"); if(dot) dot.style.display = "block";
     }, 1000);
   }
@@ -104,13 +107,19 @@ function triggerKyoongSMS() {
   localStorage.setItem('kyoongUnlockTime', Date.now());
   const item = document.getElementById('kyoongItem'); if (item) item.style.display = 'flex';
   const dot = document.getElementById('app-msg-dot'); if(dot) dot.style.display = 'block';
+  if (localStorage.getItem('kyoongLockNoticeShown') === 'true') return;
   if (!document.getElementById("kyoong-banner")) {
     const banner = document.createElement("div");
     banner.id = "kyoong-banner";
     banner.style.cssText = "position:absolute; top:40px; left:16px; right:16px; background:rgba(50,50,50,0.6); backdrop-filter:blur(25px); border-radius:20px; padding:14px 16px; display:flex; gap:12px; transform:translateY(-150%); opacity:0; transition:all 0.4s; z-index:9999; border:1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events:none;";
     banner.innerHTML = `<img src="kyoong.jpg" style="width:42px; height:42px; border-radius:8px; object-fit:cover;"><div style="flex:1; text-align:left;"><div style="font-size:14px; font-weight:600; color:#fff; display:flex; justify-content:space-between; align-items:center;"><span>信息</span><span style="font-size:12px; color:#aaa;">现在</span></div><div style="font-size:14px; color:#eee; margin-top:4px; line-height:1.3;"><b>kyoong</b>：姐姐，醒了吗？</div></div>`;
     document.getElementById("phone").appendChild(banner);
-    setTimeout(() => { banner.style.transform = "translateY(0)"; banner.style.opacity = "1"; }, 100);
+    setTimeout(() => {
+      if (localStorage.getItem('kyoongLockNoticeShown') === 'true') { banner.remove(); return; }
+      banner.style.transform = "translateY(0)";
+      banner.style.opacity = "1";
+      localStorage.setItem('kyoongLockNoticeShown', 'true');
+    }, 100);
     setTimeout(() => { banner.style.transform = "translateY(-150%)"; banner.style.opacity = "0"; }, 5000);
   }
 }

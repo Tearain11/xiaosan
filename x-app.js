@@ -1,6 +1,20 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
-  if (container.innerHTML.trim() !== "") return;
+  // 每次重新进入 X 都重置本次测试用的主推文点赞状态，确保能重新触发剧情。
+  // 即使页面 DOM 仍被保留，也要清除旧按钮的 liked 样式。
+  if (container.innerHTML.trim() !== "") {
+    localStorage.removeItem("xLiked");
+    window.hasLiked = false;
+    ["like-btn-home", "like-btn-baek"].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.classList.remove("liked");
+        btn.style.color = "#71767b";
+        btn.innerHTML = "🤍 8.65万";
+      }
+    });
+    return;
+  }
 
   // 保留点赞、私信与剧情解锁状态；需要重开剧情时应使用明确的重置入口。
 
@@ -175,9 +189,7 @@ function initXApp() {
       <div id="xChoices" style="display:none; flex-direction:column; gap:6px; padding:10px 16px 30px; background:#000;"></div>
     </div>
   `;
-  // 点赞是本轮剧情的触发动作，不从 localStorage 恢复成已点赞，
-  // 否则刷新/重新测试时按钮会被锁住，无法再次触发剧情。
-  localStorage.removeItem("xLiked");
+  // 点赞状态仅用于当前一次进入 X 的互动，不跨次进入恢复。
 }
 
 function switchXTab(tabId) {

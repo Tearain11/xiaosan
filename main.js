@@ -112,10 +112,23 @@ function checkPin() {
 }
 
 window.addEventListener("load", () => {
-  setTimeout(() => { const banner = $("lock-banner"); if(banner) { banner.style.top = "35%"; banner.classList.add("show"); } }, 200);
+  const xBanner = $("lock-banner");
+  if (xBanner && localStorage.getItem("xLockNoticeShown") !== "true") {
+    setTimeout(() => {
+      if (localStorage.getItem("xLockNoticeShown") === "true") return;
+      if (xBanner && !$("lock").classList.contains("unlocked")) {
+        xBanner.style.top = "35%";
+        xBanner.classList.add("show");
+        localStorage.setItem("xLockNoticeShown", "true");
+      }
+    }, 200);
+  } else if (xBanner) {
+    xBanner.classList.remove("show");
+  }
   renderWidgets();
   updateGlobalLanguage();
-  if(typeof initMsgApp === "function") initMsgApp(); 
+  if (typeof initMsgApp === "function") initMsgApp();
+  setTimeout(maybeShowDayTransition, 250);
 });
 
 const APPS = [
@@ -331,7 +344,8 @@ function init(){
   restoreGameAuto();
   applyWallpaper(); updateClock(); setInterval(updateClock, 10000);
   setInterval(saveGameAuto, 5000);
-  renderApps(); renderWidgets();forceGlobalHomebar(); updateGlobalLanguage();
+  renderApps(); renderWidgets(); forceGlobalHomebar(); updateGlobalLanguage();
+  setTimeout(maybeShowDayTransition, 250);
 }
 document.addEventListener("DOMContentLoaded", init);
 // 👇 终极物理外挂：全局底部隐形热区，绝对不被任何 App 遮挡

@@ -326,11 +326,14 @@ function loadGameSlot(slot) {
     const record = JSON.parse(raw);
     // 读档时不能调用 saveGameAuto()：它会从当前旧页面 DOM 重新抓取较新的聊天内容，
     // 覆盖刚读入的旧存档。必须把选中的存档数据原样写入自动存档，再刷新页面。
-    applyGameSnapshot(record.data);
+    // 先用手动存档覆盖自动存档，避免旧页面的定时保存把新剧情带回来。
     localStorage.setItem(GAME_AUTO_SAVE_KEY, JSON.stringify({
       savedAt: Date.now(),
       data: record.data
     }));
+    applyGameSnapshot(record.data);
+    // 让刷新后的页面直接进入已解锁的主屏幕。
+    sessionStorage.setItem("gameLoadReturnHome", "true");
     location.reload();
   } catch (error) { alert("这个存档无法读取。"); }
 }
@@ -351,6 +354,12 @@ function init(){
   applyWallpaper(); updateClock(); setInterval(updateClock, 10000);
   setInterval(saveGameAuto, 5000);
   renderApps(); renderWidgets(); forceGlobalHomebar(); updateGlobalLanguage();
+  // 手动读档后回到手机主屏幕，而不是重新停在锁屏界面。
+  if (sessionStorage.getItem("gameLoadReturnHome") === "true") {
+    sessionStorage.removeItem("gameLoadReturnHome");
+    $("lock").classList.add("unlocked");
+    document.querySelectorAll(".app-page").forEach(page => page.classList.remove("active"));
+  }
   setTimeout(maybeShowDayTransition, 250);
 }
 document.addEventListener("DOMContentLoaded", init);

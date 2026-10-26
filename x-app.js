@@ -2,13 +2,7 @@ function initXApp() {
   const container = document.getElementById("xAppContent");
   if (container.innerHTML.trim() !== "") return;
 
-  // 👇【新增1】每次打开推特，强制清空旧的点赞和聊天记录
-  // 这样才能保证每次测试都是从“没点过赞”开始
-  localStorage.removeItem('xLiked');
-  localStorage.removeItem('xChatHistory');
-  localStorage.removeItem('xChatFinished');
-  localStorage.removeItem('kyoongUnlockTime');
-  localStorage.removeItem('kyoongCleared');
+  // 保留点赞、私信与剧情解锁状态；需要重开剧情时应使用明确的重置入口。
 
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];

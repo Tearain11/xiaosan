@@ -358,12 +358,19 @@ function showDayTwoInvite() {
       'baek-yes': ['今天就算了，我还有别的安排。', '好呀，那待会儿见。'],
       'baek-no': ['好吧，那你下午来接我。', '今天不行，下次再说吧。']
     }[choice];
-    overlay.remove();
-    addKyoongBubble('me', response[1]);
     localStorage.setItem('dayTwoInviteChoice', choice);
     localStorage.setItem('dayTwoFinished', 'true');
-    const transition = document.getElementById('day-transition');
-    if (transition) transition.style.display = 'flex';
+    overlay.innerHTML = `
+      <div style="width:100%;max-width:420px;background:#f7f7fb;border-radius:24px;padding:20px;box-sizing:border-box;color:#1c1c1e;box-shadow:0 12px 36px rgba(0,0,0,.2);">
+        <div style="font-size:11px;letter-spacing:1.5px;color:#8e8e93;margin-bottom:12px;">MESSAGES · 已发送</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:14px;">你的回复</div>
+        <div style="font-size:12px;color:#8e8e93;margin-bottom:5px;">男朋友</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px;"><div style="background:#007aff;color:#fff;border-radius:18px;padding:10px 14px;font-size:14px;max-width:85%;line-height:1.5;">${response[0]}</div></div>
+        <div style="font-size:12px;color:#8e8e93;margin-bottom:5px;">边伯贤</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:18px;"><div style="background:#007aff;color:#fff;border-radius:18px;padding:10px 14px;font-size:14px;max-width:85%;line-height:1.5;">${response[1]}</div></div>
+        <button id="day2-return" style="width:100%;padding:13px;border:0;border-radius:14px;background:#007aff;color:white;font-size:15px;">返回手机</button>
+      </div>`;
+    overlay.querySelector('#day2-return').addEventListener('click', () => overlay.remove());
   });
 }
 function showKyoongEnding() {

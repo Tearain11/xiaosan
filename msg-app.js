@@ -112,7 +112,7 @@ function initMsgApp() {
     </div>
   `;
 
-  if (!document.getElementById("lock-msg-banner") && localStorage.getItem("boyfriendLockNoticeShown") !== "true") {
+  if (!document.getElementById("lock-msg-banner") && localStorage.getItem("boyfriendOpeningNoticeShown") !== "true") {
     const banner = document.createElement("div");
     banner.id = "lock-msg-banner";
     banner.style.cssText = "position:absolute; top:50%; left:16px; right:16px; background:rgba(50,50,50,0.6); backdrop-filter:blur(25px); border-radius:20px; padding:14px 16px; display:flex; gap:12px; transform:scale(0.9); opacity:0; transition:all 0.4s; z-index:9999; border:1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events:none;";
@@ -121,10 +121,10 @@ function initMsgApp() {
     
     setTimeout(() => {
       if (document.getElementById("lock").classList.contains("unlocked")) return;
-      if (localStorage.getItem("boyfriendLockNoticeShown") === "true") { banner.remove(); return; }
+      if (localStorage.getItem("boyfriendOpeningNoticeShown") === "true") { banner.remove(); return; }
       banner.style.transform = "scale(1)";
       banner.style.opacity = "1";
-      localStorage.setItem("boyfriendLockNoticeShown", "true");
+      localStorage.setItem("boyfriendOpeningNoticeShown", "true");
       const dot = document.getElementById("app-msg-dot"); if(dot) dot.style.display = "block";
     }, 1000);
   }

@@ -269,6 +269,13 @@ const GAME_SAVE_PREFIX = "gameSaveSlot_";
 const GAME_AUTO_SAVE_KEY = "gameAutoSave";
 const SETTINGS_KEYS = new Set(["sysLang", "userName", "userAvatar", "userBg"]);
 function getGameSnapshot() {
+  // 保存瞬间直接读取当前 DOM 和剧情变量，不再依赖 500ms 定时器是否刚好运行。
+  const boyfriendArea = document.getElementById('chatArea');
+  const baekArea = document.getElementById('kyoongArea');
+  if (boyfriendArea) localStorage.setItem('storyChat_boyfriend', boyfriendArea.innerHTML);
+  if (baekArea) localStorage.setItem('storyChat_baek', baekArea.innerHTML);
+  if (typeof msgStep !== 'undefined') localStorage.setItem('storyStep_boyfriend', String(msgStep || 0));
+  if (typeof kyoongStep !== 'undefined') localStorage.setItem('storyStep_baek', String(kyoongStep || 0));
   const snapshot = {};
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);

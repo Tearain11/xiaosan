@@ -5,12 +5,8 @@ function initMsgApp() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
 
-  // 时间锁
-  let unlockTime = parseInt(localStorage.getItem('kyoongUnlockTime') || '0');
-  let isKyoongUnlocked = false;
-  if (unlockTime > 0 && (Date.now() - unlockTime < 3600000)) {
-    isKyoongUnlocked = true;
-  }
+  // 只有剧情正式触发后才显示 kyoong；不使用旧时间戳，避免刷新后提前出现。
+  const isKyoongUnlocked = localStorage.getItem('kyoongCleared') === 'true';
 
   container.innerHTML = `
     <div style="display:flex; flex-direction:column; height:100%; background:#fff; color:#000;">

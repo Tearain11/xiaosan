@@ -55,6 +55,33 @@ function initSettingsApp() {
         </div>
       </div>
 
+      <div style="background:#fff; margin:0 16px 16px; border-radius:12px; overflow:hidden;">
+        <div style="padding:16px; font-size:16px; font-weight:600; border-bottom:1px solid #eee;">💾 游戏存档</div>
+        <div style="padding:14px 16px; color:#1c1c1e; font-size:14px; border-bottom:1px solid #eee;">
+          <div style="font-weight:600; margin-bottom:5px;">自动存档</div>
+          <div style="color:#8e8e93; font-size:12px;">剧情变化会自动保存，刷新页面后继续游戏。</div>
+        </div>
+        <div style="padding:12px 16px 4px; font-size:13px; color:#8e8e93;">手动存档</div>
+        <div style="padding:8px 12px 12px; display:grid; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 4px;">
+            <div style="flex:1;"><div style="font-size:14px; color:#1c1c1e;">存档位 1</div><div class="game-save-slot-state" style="font-size:11px; color:#8e8e93; margin-top:3px;">空存档位</div></div>
+            <button data-save-slot="1" onclick="saveGameSlot(1)" style="border:0; border-radius:18px; padding:8px 12px; background:#007aff; color:#fff;">保存</button>
+            <button onclick="loadGameSlot(1)" style="border:0; border-radius:18px; padding:8px 12px; background:#f2f2f7; color:#007aff;">读取</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 4px; border-top:1px solid #f2f2f7;">
+            <div style="flex:1;"><div style="font-size:14px; color:#1c1c1e;">存档位 2</div><div class="game-save-slot-state" style="font-size:11px; color:#8e8e93; margin-top:3px;">空存档位</div></div>
+            <button data-save-slot="2" onclick="saveGameSlot(2)" style="border:0; border-radius:18px; padding:8px 12px; background:#007aff; color:#fff;">保存</button>
+            <button onclick="loadGameSlot(2)" style="border:0; border-radius:18px; padding:8px 12px; background:#f2f2f7; color:#007aff;">读取</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 4px; border-top:1px solid #f2f2f7;">
+            <div style="flex:1;"><div style="font-size:14px; color:#1c1c1e;">存档位 3</div><div class="game-save-slot-state" style="font-size:11px; color:#8e8e93; margin-top:3px;">空存档位</div></div>
+            <button data-save-slot="3" onclick="saveGameSlot(3)" style="border:0; border-radius:18px; padding:8px 12px; background:#007aff; color:#fff;">保存</button>
+            <button onclick="loadGameSlot(3)" style="border:0; border-radius:18px; padding:8px 12px; background:#f2f2f7; color:#007aff;">读取</button>
+          </div>
+          <div id="game-save-status" style="font-size:12px; color:#34a853; min-height:16px; padding:0 4px;"></div>
+        </div>
+      </div>
+
       <div id="langListPopup" style="display:none; position:absolute; inset:0; background:#f2f2f7; z-index:999;">
         <div style="padding: 48px 16px 10px; display:flex; align-items:center; background:#f9f9f9; border-bottom:1px solid #ddd;">
           <span onclick="toggleLangList()" style="color:#007aff; font-size:16px; cursor:pointer; margin-right:10px;">‹ ${t.title}</span>
@@ -77,6 +104,8 @@ function initSettingsApp() {
     const img = document.getElementById('set-avatar-img');
     if(img) { img.src = savedAvatar; img.style.display = 'block'; document.getElementById('set-avatar-text').style.display = 'none'; }
   }
+
+  if (typeof renderGameSaveSlots === 'function') renderGameSaveSlots();
 
   const nameInput = document.getElementById('set-username');
   if(nameInput) {

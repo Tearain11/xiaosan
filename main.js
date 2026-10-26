@@ -1,6 +1,16 @@
 // 👇 最暴力的默认语言强制重置（必须放在所有代码的最前面）
 localStorage.setItem('sysLang', 'zh-CN');
 
+// 每次完整加载/刷新网页时重置剧情进度；切换 App 不会重新执行这段代码。
+// 玩家资料、头像、壁纸等设置不在此列表中，因此会继续保留。
+[
+  'kyoongUnlockTime',
+  'kyoongCleared',
+  'xLiked',
+  'xChatHistory',
+  'xChatFinished'
+].forEach(key => localStorage.removeItem(key));
+
 const CONFIG = { wallpaper: "wallpaper.jpg", passcode: "0506" };
 const $ = id => document.getElementById(id);
 

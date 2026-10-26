@@ -353,7 +353,7 @@ function showDayTwoInvite() {
         }
         if (boyfriendPreview) boyfriendPreview.textContent = '宝宝，给我一个机会，好不好？';
         // 第 4 段：男朋友发完后，再弹出边伯贤独立的新消息预览。
-        setTimeout(() => showStoryNotification('day-two-baek-notice', '边伯贤', '姐姐，那我等你回复哦。', baekAvatar, () => {
+        setTimeout(() => showStoryNotification('day-two-baek-notice', '边伯贤', '所以，姐姐下午有空嘛？', baekAvatar, () => {
           addKyoongBubble('them', '姐姐，那我等你回复哦。');
           if (baekPreview) baekPreview.textContent = '姐姐，那我等你回复哦。';
           // 两边都发完后才开放四个具体回复。为让两边选项同时可见，切回边伯贤聊天框展示选择面板。

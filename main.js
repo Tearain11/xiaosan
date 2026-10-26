@@ -1,6 +1,3 @@
-// 👇 最暴力的默认语言强制重置（必须放在所有代码的最前面）
-localStorage.setItem('sysLang', 'zh-CN');
-
 const CONFIG = { wallpaper: "wallpaper.jpg", passcode: "0506" };
 const $ = id => document.getElementById(id);
 
@@ -80,7 +77,8 @@ lockScreen.addEventListener("touchstart", e => { startY = e.touches[0].clientY; 
 lockScreen.addEventListener("touchmove", e => { if(startY !== null && startY - e.touches[0].clientY > 50){ showPasscode(); startY = null; } }, {passive:true});
 lockScreen.addEventListener("mousedown", e => { startY = e.clientY; });
 lockScreen.addEventListener("mouseup", e => { if(startY !== null && startY - e.clientY > 50) showPasscode(); startY = null; });
-$("lock-main").addEventListener("click", showPasscode);
+const lockHomebar = $("lock-homebar");
+if (lockHomebar) lockHomebar.addEventListener("click", showPasscode);
 
 $("keypad").addEventListener("click", e => {
   const key = e.target.closest(".key"); if(!key || key.classList.contains("empty")) return;

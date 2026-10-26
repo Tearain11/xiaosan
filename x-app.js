@@ -1,14 +1,22 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
-  if (container.innerHTML.trim() !== "") return;
+  // 每次进入 X 时重置主推文点赞状态；避免旧 DOM / CSS 把剧情触发按钮锁住。
+  localStorage.removeItem("xLiked");
+  window.hasLiked = false;
+  if (container.innerHTML.trim() !== "") {
+    ["like-btn-home", "like-btn-baek"].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.classList.remove("liked");
+        btn.style.color = "#71767b";
+        btn.innerHTML = "🤍 8.65万";
+        btn.onclick = function () { triggerLike(this, "8.65万", true); };
+      }
+    });
+    return;
+  }
 
-  // 👇【新增1】每次打开推特，强制清空旧的点赞和聊天记录
-  // 这样才能保证每次测试都是从“没点过赞”开始
-  localStorage.removeItem('xLiked');
-  localStorage.removeItem('xChatHistory');
-  localStorage.removeItem('xChatFinished');
-  localStorage.removeItem('kyoongUnlockTime');
-  localStorage.removeItem('kyoongCleared');
+  // 保留点赞、私信与剧情解锁状态；需要重开剧情时应使用明确的重置入口。
 
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
@@ -181,6 +189,7 @@ function initXApp() {
       <div id="xChoices" style="display:none; flex-direction:column; gap:6px; padding:10px 16px 30px; background:#000;"></div>
     </div>
   `;
+  // 点赞状态仅用于当前一次进入 X 的互动，不跨次进入恢复。
 }
 
 function switchXTab(tabId) {
@@ -230,8 +239,12 @@ function triggerLike(element, originalCount, isMainTweet) {
       document.getElementById('notify-dot').style.display = 'block';
       
       setTimeout(() => {
-        document.getElementById('msg-list-content').innerHTML = `<div onclick="openXChat()" style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px; align-items:center; cursor:pointer;"><img src="avatar.jpg" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:bold;">${t.tw_baek}</span><span style="color:#71767b; font-size:13px;">${t.tw_just_now}</span></div><div style="color:#71767b; font-size:14px; margin-top:2px;">${t.tw_1}</div></div></div>`;
-        document.getElementById('msg-dot').style.display = 'block';
+        document.getElementById('msg-list-content').innerHTML = `<div onclick="openXChat()" style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px; align-items:center; cursor:pointer;"><img src="avatar.jpg" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:bold;">${t.tw_baek}</span><span id="x-dm-list-meta" style="color:#71767b; font-size:13px;">${t.tw_just_now} · ${localStorage.getItem('xChatRead') === 'true' ? t.read : t.unread}</span></div><div id="x-dm-list-preview" style="color:#71767b; font-size:14px; margin-top:2px;">${t.tw_1}</div></div></div>`;
+        document.getElementById('msg-dot').style.display = localStorage.getItem('xChatRead') === 'true' ? 'none' : 'block';
+        if (localStorage.getItem('xChatRead') === 'true') {
+          const meta = document.getElementById('x-dm-list-meta');
+          if (meta) meta.innerHTML = `${t.tw_just_now} · ${t.read}`;
+        }
       }, 800);
     }, 400);
   }
@@ -240,7 +253,24 @@ function triggerLike(element, originalCount, isMainTweet) {
 let xChatStarted = false;
 function openXChat() {
   document.getElementById('x-chatroom').style.display = 'flex';
+  // 打开私信即将收到的消息标记为已读，并同步更新会话列表的未读点。
+  localStorage.setItem('xChatRead', 'true');
+  const dot = document.getElementById('msg-dot');
+  if (dot) dot.style.display = 'none';
+  const lang = localStorage.getItem('sysLang') || 'zh-CN';
+  const t = window.trans[lang] || window.trans['zh-CN'];
+  const listMeta = document.getElementById('x-dm-list-meta');
+  if (listMeta) listMeta.innerHTML = `${t.tw_just_now} · ${t.read}`;
+  markXMessagesAsRead();
   if(!xChatStarted) { xChatStarted = true; startXChat(); }
+}
+
+function markXMessagesAsRead() {
+  let lang = localStorage.getItem('sysLang') || 'zh-CN';
+  const t = window.trans[lang] || window.trans['zh-CN'];
+  document.querySelectorAll('#xChatArea .x-message-meta').forEach(el => {
+    if (el.dataset.from === 'them') el.innerHTML = `${t.tw_just_now} · <span style="color:#71767b;">${t.read}</span>`;
+  });
 }
 
 function closeXChat() { document.getElementById('x-chatroom').style.display = 'none'; }
@@ -248,8 +278,20 @@ function closeXChat() { document.getElementById('x-chatroom').style.display = 'n
 function startXChat() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
-  const area = document.getElementById("xChatArea"); area.innerHTML = "";
-  const inputBox = document.getElementById("xInputText"); inputBox.style.opacity = "0.5"; inputBox.style.cursor = "default"; inputBox.onclick = null;
+  const area = document.getElementById("xChatArea");
+  const inputBox = document.getElementById("xInputText");
+  const savedHistory = JSON.parse(localStorage.getItem("xChatHistory") || "[]");
+  if (savedHistory.length) {
+    area.innerHTML = "";
+    savedHistory.forEach(item => addXBubble(item.from, item.text, false, false));
+    const finished = localStorage.getItem("xChatFinished") === "true";
+    inputBox.style.opacity = finished ? "0.5" : "1";
+    inputBox.style.cursor = finished ? "default" : "pointer";
+    if (!finished) inputBox.onclick = showXChoices;
+    return;
+  }
+  area.innerHTML = "";
+  inputBox.style.opacity = "0.5"; inputBox.style.cursor = "default"; inputBox.onclick = null;
   
   addXBubble("them", t.tw_1, false);
   setTimeout(() => {
@@ -262,16 +304,23 @@ function startXChat() {
   }, 2000);
 }
 
-function addXBubble(from, text, showChoices) {
+function addXBubble(from, text, showChoices, save = true) {
+  if (save) {
+    const history = JSON.parse(localStorage.getItem("xChatHistory") || "[]");
+    history.push({ from, text });
+    localStorage.setItem("xChatHistory", JSON.stringify(history));
+  }
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
   const area = document.getElementById("xChatArea");
   const row = document.createElement("div");
   row.style.display = "flex"; row.style.gap = "10px"; row.style.maxWidth = "85%"; row.style.alignItems = "flex-end";
   row.style.alignSelf = from === "them" ? "flex-start" : "flex-end"; row.style.flexDirection = from === "them" ? "row" : "row-reverse";
-  const timeText = from === "them" ? `${t.tw_just_now} · <span style='color:#71767b;'>${t.unread}</span>` : `${t.tw_just_now} · ${t.read}`;
-  row.innerHTML = `<div><div style="padding:12px 16px; border-radius:20px; font-size:15px; line-height:1.4; background:${from === 'them' ? '#2f3336' : '#1d9bf0'}; color:#fff; border-bottom-${from === 'them' ? 'left' : 'right'}-radius:4px;">${text}</div><div ${from === "them" ? 'id="last-meta"' : ''} style="font-size:11px; color:#71767b; display:flex; justify-content:${from === 'them' ? 'flex-start' : 'flex-end'}; margin-top:4px; gap:4px;">${timeText}</div></div>`;
+  const alreadyRead = localStorage.getItem('xChatRead') === 'true';
+  const timeText = from === "them" ? `${t.tw_just_now} · <span style='color:#71767b;'>${alreadyRead ? t.read : t.unread}</span>` : `${t.tw_just_now} · ${t.read}`;
+  row.innerHTML = `<div><div style="padding:12px 16px; border-radius:20px; font-size:15px; line-height:1.4; background:${from === 'them' ? '#2f3336' : '#1d9bf0'}; color:#fff; border-bottom-${from === 'them' ? 'left' : 'right'}-radius:4px;">${text}</div><div ${from === "them" ? 'id="last-meta"' : ''} class="x-message-meta" data-from="${from}" style="font-size:11px; color:#71767b; display:flex; justify-content:${from === 'them' ? 'flex-start' : 'flex-end'}; margin-top:4px; gap:4px;">${timeText}</div></div>`;
   area.appendChild(row); area.scrollTop = area.scrollHeight;
+  if (from === 'them' && alreadyRead) markXMessagesAsRead();
   
   if (showChoices) {
     setTimeout(() => {

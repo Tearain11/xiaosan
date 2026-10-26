@@ -324,8 +324,13 @@ function loadGameSlot(slot) {
   if (!confirm("读取存档会替换当前游戏进度，确定继续吗？")) return;
   try {
     const record = JSON.parse(raw);
+    // 读档时不能调用 saveGameAuto()：它会从当前旧页面 DOM 重新抓取较新的聊天内容，
+    // 覆盖刚读入的旧存档。必须把选中的存档数据原样写入自动存档，再刷新页面。
     applyGameSnapshot(record.data);
-    saveGameAuto();
+    localStorage.setItem(GAME_AUTO_SAVE_KEY, JSON.stringify({
+      savedAt: Date.now(),
+      data: record.data
+    }));
     location.reload();
   } catch (error) { alert("这个存档无法读取。"); }
 }

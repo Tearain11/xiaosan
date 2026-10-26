@@ -212,6 +212,14 @@ html, body { height: 100%; margin: 0; overflow: hidden; background: #111; color:
 .ios-calendar-empty { display:flex; align-items:center; gap:12px; padding:16px 0; color:#8e8e93; font-size:14px; border-top:1px solid #f2f2f7; }
 .ios-calendar-empty-dot { width:8px; height:8px; border-radius:50%; background:#007aff; }
 
+/* 剧情日历标题与临时日历小图标 */
+.story-days-heading { display:flex; align-items:center; justify-content:space-between; margin:0 0 8px; color:#1c1c1e; font-size:22px; font-weight:700; letter-spacing:-.4px; }
+.story-days-calendar-icon { position:relative; display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border:2px solid #7aa7f8; border-radius:7px; box-sizing:border-box; background:linear-gradient(to bottom,#7aa7f8 0 7px,#eef5ff 7px 100%); }
+.story-days-calendar-icon::before, .story-days-calendar-icon::after { content:""; position:absolute; top:-5px; width:3px; height:7px; border-radius:2px; background:#7aa7f8; }
+.story-days-calendar-icon::before { left:6px; }
+.story-days-calendar-icon::after { right:6px; }
+.story-days-calendar-icon span { width:6px; height:6px; border-radius:50%; background:#7aa7f8; margin-top:5px; }
+ 
 /* 剧情日历列表：接近 iOS 原生日历的简洁列表 */
 .story-days-list { margin-top: 4px; }
 .story-day-row { display:flex; align-items:center; justify-content:space-between; min-height:56px; padding:0 2px; border-top:1px solid #f2f2f7; }

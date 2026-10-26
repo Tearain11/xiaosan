@@ -235,6 +235,10 @@ function initCalendarApp() {
         <div class="ios-calendar-weekdays">${weekdays.map(day => '<span>' + day + '</span>').join('')}</div>
         <div class="ios-calendar-grid">${cells}</div>
         <div class="ios-calendar-divider"></div>
+        <div class="story-days-heading">
+          <span>Story Days</span>
+          <span class="story-days-calendar-icon" aria-hidden="true"><span></span></span>
+        </div>
         <div class="story-days-list">${storyDays}</div>
       </div>
     </div>`;

@@ -213,8 +213,7 @@ function initCalendarApp() {
     const completionKey = day === 1 ? "dayOneFinished" : "day" + day + "Finished";
     const isComplete = localStorage.getItem(completionKey) === "true";
     storyDays += `<div class="story-day-row">
-      <div class="story-day-icon"><span>${day}</span></div>
-      <div class="story-day-label">第${day}天</div>
+      <div class="story-day-label">Day ${day}</div>
       <div class="story-day-status">${isComplete ? '<span class="story-day-check" aria-label="已完成">✓</span>' : ''}</div>
     </div>`;
   }

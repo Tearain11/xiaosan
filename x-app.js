@@ -1,5 +1,14 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
+  if (container.innerHTML.trim() !== "") return;
+
+  // 👇【新增1】每次打开推特，强制清空旧的点赞和聊天记录
+  // 这样才能保证每次测试都是从“没点过赞”开始
+  localStorage.removeItem('xLiked');
+  localStorage.removeItem('xChatHistory');
+  localStorage.removeItem('xChatFinished');
+  localStorage.removeItem('kyoongUnlockTime');
+  localStorage.removeItem('kyoongCleared');
 
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
@@ -10,6 +19,8 @@ function initXApp() {
         <svg viewBox="0 0 24 24" style="width:24px; height:24px; fill:#fff;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       </div>
       <div style="flex:1; overflow-y:auto; padding-bottom:60px;">
+        
+        <!-- 刚刚发布的推文 -->
         <div style="border-bottom:1px solid #2f3336; padding:15px;">
           <div style="display:flex; gap:10px;">
             <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover; cursor:pointer;" onclick="switchXTab('baek')">
@@ -25,12 +36,14 @@ function initXApp() {
               <div style="display:flex; justify-content:space-between; margin-top:12px; color:#71767b; font-size:13px; padding-right:15px;">
                 <span style="cursor:pointer;">💬 3.46万</span>
                 <span style="cursor:pointer;">🔁 2.35万</span>
+                <!-- 手动点赞按钮 -->
                 <span id="like-btn-home" style="cursor:pointer; transition: color 0.2s;" onclick="triggerLike(this, '8.65万', true)">🤍 8.65万</span>
                 <span style="cursor:pointer;">📊 18.3万</span>
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -44,11 +57,13 @@ function initXApp() {
       <div id="msg-list-content" style="flex:1; overflow-y:auto; padding-bottom:60px;"></div>
     </div>
 
+    <!-- 边伯贤主页 -->
     <div id="x-tab-baek" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column; overflow-y:auto; padding-bottom:60px;">
       <div style="padding-top:44px; padding:10px 16px; display:flex; align-items:center; gap:20px; position:sticky; top:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); z-index:10;">
         <span style="font-size:24px; cursor:pointer; color:#fff;" onclick="switchXTab('home')">←</span>
         <div style="font-weight:bold; font-size:18px; color:#fff;">${t.tw_baek}</div>
       </div>
+      
       <div style="position:relative; width:100%; height:150px; flex-shrink:0; background-color:#333;">
         <img src="bg.jpg" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
       </div>
@@ -60,6 +75,8 @@ function initXApp() {
           <div style="color:#71767b; font-size:15px;">@baekhyun</div>
         </div>
       </div>
+
+      <!-- 刚刚 (Sit down) -->
       <div style="border-bottom:1px solid #2f3336; padding:15px; margin-top:10px;">
         <div style="display:flex; gap:10px;">
           <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
@@ -77,13 +94,52 @@ function initXApp() {
           </div>
         </div>
       </div>
+
+      <!-- 10月10日 (Black Dream) -->
+      <div style="border-bottom:1px solid #2f3336; padding:15px;">
+        <div style="display:flex; gap:10px;">
+          <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+          <div style="flex:1;">
+            <div style="font-size:15px; color:#fff;"><b>${t.tw_baek}</b> <span style="color:#71767b;">· 10月10日</span></div>
+            <div style="margin-top:5px; font-size:15px; color:#fff;">Black Dream🤫</div>
+            <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
+              <img src="baek_black.jpg" style="width:100%; display:block;" onerror="this.style.display='none'">
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px; color:#71767b; font-size:13px; padding-right:15px;">
+              <span>💬 2.1万</span><span>🔁 1.68万</span>
+              <span style="cursor:pointer;" onclick="triggerLike(this, '6.49万', false)">🤍 6.49万</span>
+              <span>📊 14.5万</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10月18日 (出差✈️) -->
+      <div style="border-bottom:1px solid #2f3336; padding:15px;">
+        <div style="display:flex; gap:10px;">
+          <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+          <div style="flex:1;">
+            <div style="font-size:15px; color:#fff;"><b>${t.tw_baek}</b> <span style="color:#71767b;">· 10月18日</span></div>
+            <div style="margin-top:5px; font-size:15px; color:#fff;">出差✈️</div>
+            <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
+              <img src="baek_plane.jpg" style="width:100%; display:block;" onerror="this.style.display='none'">
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px; color:#71767b; font-size:13px; padding-right:15px;">
+              <span>💬 1,204</span><span>🔁 3,186</span>
+              <span style="cursor:pointer;" onclick="triggerLike(this, '9,403', false)">🤍 9,403</span>
+              <span>📊 16.9万</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div id="x-tab-profile" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column; overflow-y:auto; padding-bottom:60px;">
       <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; border-bottom:1px solid #2f3336;">${t.tw_profile}</div>
       <div style="height:150px; background:#333; position:relative; cursor:pointer;" onclick="document.getElementById('upload-bg').click()">
         <img id="user-bg-img" style="width:100%; height:100%; object-fit:cover; display:none;">
-        <div id="user-bg-placeholder" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #1c1c1e, #3a3a3c); color:#888; font-size:12px;">上传背景</div>
+        <div id="user-bg-placeholder" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #1c1c1e, #3a3a3c); color:#888; font-size:12px;">点击上传背景</div>
         <input type="file" id="upload-bg" accept="image/*" style="display:none;" onchange="uploadUserImg(this, 'user-bg-img', 'user-bg-placeholder')">
       </div>
       <div style="padding: 0 15px; margin-top:-40px; position:relative;">
@@ -93,10 +149,10 @@ function initXApp() {
           <input type="file" id="upload-avatar" accept="image/*" style="display:none;" onchange="uploadUserImg(this, 'user-avatar-img', 'user-avatar-placeholder')">
         </div>
         <div style="margin-top:10px;">
-          <div style="font-size:20px; font-weight:bold; outline:none; color:#fff;" contenteditable="true">我的名字</div>
+          <div style="font-size:20px; font-weight:bold; outline:none; color:#fff;" contenteditable="true">你的名字</div>
           <div style="color:#71767b; font-size:15px; outline:none; margin-top:4px;" contenteditable="true">@my_account</div>
         </div>
-        <div style="margin-top:15px; font-size:15px; outline:none; min-height:20px; color:#fff;" contenteditable="true">点击这里编辑简介...</div>
+        <div style="margin-top:15px; font-size:15px; outline:none; min-height:20px; color:#fff;" contenteditable="true">点击这里编辑你的简介...</div>
       </div>
     </div>
 
@@ -125,17 +181,15 @@ function initXApp() {
       <div id="xChoices" style="display:none; flex-direction:column; gap:6px; padding:10px 16px 30px; background:#000;"></div>
     </div>
   `;
-
-  // 恢复自定义上传的图片
-  const savedBg = localStorage.getItem('userBg');
-  if(savedBg) { const img = document.getElementById('user-bg-img'); if(img){ img.src = savedBg; img.style.display = 'block'; document.getElementById('user-bg-placeholder').style.display = 'none'; } }
-  const savedAvatar = localStorage.getItem('userAvatar');
-  if(savedAvatar) { const img = document.getElementById('user-avatar-img'); if(img){ img.src = savedAvatar; img.style.display = 'block'; document.getElementById('user-avatar-placeholder').style.display = 'none'; } }
 }
 
 function switchXTab(tabId) {
-  document.querySelectorAll('.x-tab').forEach(el => el.style.display = 'none');
-  document.querySelectorAll('[id^="x-tab-"]').forEach(el => el.style.display = 'none');
+  document.getElementById('x-tab-home').style.display = 'none';
+  document.getElementById('x-tab-notify').style.display = 'none';
+  document.getElementById('x-tab-msg').style.display = 'none';
+  document.getElementById('x-tab-baek').style.display = 'none';
+  document.getElementById('x-tab-profile').style.display = 'none';
+  
   const target = document.getElementById('x-tab-' + tabId);
   if(target) target.style.display = 'flex';
 
@@ -152,28 +206,18 @@ function uploadUserImg(input, imgId, placeholderId) {
     const reader = new FileReader();
     reader.onload = function(e) {
       const img = document.getElementById(placeholderId === 'user-bg-placeholder' ? 'user-bg-img' : 'user-avatar-img');
-      if(img) {
-        img.src = e.target.result; img.style.display = 'block'; 
-        document.getElementById(placeholderId).style.display = 'none';
-        localStorage.setItem(placeholderId === 'user-bg-placeholder' ? 'userBg' : 'userAvatar', e.target.result);
-      }
+      img.src = e.target.result; img.style.display = 'block'; document.getElementById(placeholderId).style.display = 'none';
+      localStorage.setItem(placeholderId === 'user-bg-placeholder' ? 'userBg' : 'userAvatar', e.target.result);
     };
     reader.readAsDataURL(input.files[0]);
   }
 }
 
-// 暴力点赞弹出逻辑
 function triggerLike(element, originalCount, isMainTweet) {
   if (element.classList.contains("liked")) return;
-
-  // 👇 核心修复：只要玩家一点赞，就强行清空旧的 kyoong 记录，防止他提前出来
-  localStorage.removeItem('kyoongUnlockTime');
-  localStorage.removeItem('kyoongUnlocked');
-
-  element.classList.add("liked"); 
-  element.innerHTML = `❤️ ${originalCount}`; 
-  element.style.color = "#f91880"; 
-  if (isMainTweet) {
+  element.classList.add("liked"); element.innerHTML = `❤️ ${originalCount}`; element.style.color = "#f91880";
+  
+  if (isMainTweet && !window.hasLiked) {
     window.hasLiked = true;
     const btnBaek = document.getElementById('like-btn-baek'); if(btnBaek) { btnBaek.innerHTML = `❤️ 8.65万`; btnBaek.style.color = "#f91880"; }
     const btnHome = document.getElementById('like-btn-home'); if(btnHome) { btnHome.innerHTML = `❤️ 8.65万`; btnHome.style.color = "#f91880"; }
@@ -182,19 +226,11 @@ function triggerLike(element, originalCount, isMainTweet) {
     const t = window.trans[lang] || window.trans['zh-CN'];
 
     setTimeout(() => {
-      // 强塞通知
-      const notifyList = document.getElementById('notify-content');
-      if(notifyList) {
-        notifyList.innerHTML = `<div style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px;"><img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%;"><div><div><b>${t.tw_baek}</b> ${t.tw_follow}</div><div style="color:#71767b; font-size:13px; margin-top:5px;">${t.tw_just_now}</div></div></div>`;
-      }
+      document.getElementById('notify-content').innerHTML = `<div style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px;"><img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%;"><div><div><b>${t.tw_baek}</b> ${t.tw_follow}</div><div style="color:#71767b; font-size:13px; margin-top:5px;">${t.tw_just_now}</div></div></div>`;
       document.getElementById('notify-dot').style.display = 'block';
       
       setTimeout(() => {
-        // 强塞私信
-        const msgList = document.getElementById('msg-list-content');
-        if(msgList) {
-          msgList.innerHTML = `<div onclick="openXChat()" style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px; align-items:center; cursor:pointer;"><img src="avatar.jpg" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:bold;">${t.tw_baek}</span><span style="color:#71767b; font-size:13px;">${t.tw_just_now}</span></div><div style="color:#71767b; font-size:14px; margin-top:2px;">${t.tw_1}</div></div></div>`;
-        }
+        document.getElementById('msg-list-content').innerHTML = `<div onclick="openXChat()" style="padding:16px; border-bottom:1px solid #2f3336; display:flex; gap:10px; align-items:center; cursor:pointer;"><img src="avatar.jpg" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:bold;">${t.tw_baek}</span><span style="color:#71767b; font-size:13px;">${t.tw_just_now}</span></div><div style="color:#71767b; font-size:14px; margin-top:2px;">${t.tw_1}</div></div></div>`;
         document.getElementById('msg-dot').style.display = 'block';
       }, 800);
     }, 400);
@@ -206,12 +242,14 @@ function openXChat() {
   document.getElementById('x-chatroom').style.display = 'flex';
   if(!xChatStarted) { xChatStarted = true; startXChat(); }
 }
+
 function closeXChat() { document.getElementById('x-chatroom').style.display = 'none'; }
 
 function startXChat() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
   const area = document.getElementById("xChatArea"); area.innerHTML = "";
+  const inputBox = document.getElementById("xInputText"); inputBox.style.opacity = "0.5"; inputBox.style.cursor = "default"; inputBox.onclick = null;
   
   addXBubble("them", t.tw_1, false);
   setTimeout(() => {
@@ -227,7 +265,6 @@ function startXChat() {
 function addXBubble(from, text, showChoices) {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
-  
   const area = document.getElementById("xChatArea");
   const row = document.createElement("div");
   row.style.display = "flex"; row.style.gap = "10px"; row.style.maxWidth = "85%"; row.style.alignItems = "flex-end";
@@ -247,41 +284,23 @@ function addXBubble(from, text, showChoices) {
 function showXChoices() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
-
   const inputBox = document.getElementById("xInputText");
   if(inputBox.onclick === null) return; 
   inputBox.onclick = null; inputBox.style.opacity = "0.3"; inputBox.textContent = ""; inputBox.style.cursor = "default";
-
-  const choicesDiv = document.getElementById("xChoices"); 
-  choicesDiv.style.display = "flex"; choicesDiv.innerHTML = "";
-
-  const options = [
-    { text: t.tw_opt1, reply: t.tw_rep1 },
-    { text: t.tw_opt2, reply: t.tw_rep2 }
-  ];
+  const choicesDiv = document.getElementById("xChoices"); choicesDiv.style.display = "flex"; choicesDiv.innerHTML = "";
+  const options = [ { text: t.tw_opt1, reply: t.tw_rep1 }, { text: t.tw_opt2, reply: t.tw_rep2 } ];
   
   options.forEach(opt => {
     const btn = document.createElement("button"); btn.textContent = opt.text;
     btn.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer;";
     btn.onclick = () => {
-      choicesDiv.style.display = "none"; 
-      addXBubble("me", opt.text, false);
-      
-      // 修复重复弹出的逻辑
+      choicesDiv.style.display = "none"; addXBubble("me", opt.text, false);
       setTimeout(() => {
-        addXBubble("them", opt.reply, false); // 这里只弹一次回复（如果是选1，回复半月；选2，回复视频）
-        
+        addXBubble("them", opt.reply, false);
         if (opt.text === t.tw_opt1) {
-          // 选1的分支
-          setTimeout(() => {
-            addXBubble("them", t.tw_meet1, false);
-            setTimeout(() => { showCounterAttack(); }, 2000);
-          }, 2000);
+          setTimeout(() => { addXBubble("them", t.tw_meet1, false); setTimeout(() => { showCounterAttack(); }, 2000); }, 2000);
         } else {
-          // 选2的分支（直接进入小狗选项，不重复发那句话）
-          setTimeout(() => {
-            showSubChoices();
-          }, 2000);
+          setTimeout(() => { addXBubble("them", t.tw_rep2, false); setTimeout(() => { showSubChoices(); }, 1500); }, 2000);
         }
       }, 1500);
     };
@@ -292,29 +311,17 @@ function showXChoices() {
 function showSubChoices() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
-
-  document.getElementById("xInputText").style.opacity = "1"; 
-  document.getElementById("xInputText").style.cursor = "pointer";
+  document.getElementById("xInputText").style.opacity = "1"; document.getElementById("xInputText").style.cursor = "pointer";
   document.getElementById("xInputText").onclick = () => {
-    document.getElementById("xInputText").onclick = null;
-    document.getElementById("xInputText").style.opacity = "0.3";
-    document.getElementById("xInputText").textContent = "";
-    
+    document.getElementById("xInputText").onclick = null; document.getElementById("xInputText").style.opacity = "0.3"; document.getElementById("xInputText").textContent = "";
     const choicesDiv = document.getElementById("xChoices"); choicesDiv.style.display = "flex"; choicesDiv.innerHTML = "";
-    const opts = [
-      { text: t.tw_opt3, reply: t.tw_rep3 },
-      { text: t.tw_opt4, reply: t.tw_rep4 }
-    ];
+    const opts = [ { text: t.tw_opt3, reply: t.tw_rep3 }, { text: t.tw_opt4, reply: t.tw_rep4 } ];
     opts.forEach(o => {
       const btn = document.createElement("button"); btn.textContent = o.text;
       btn.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer;";
       btn.onclick = () => {
-        choicesDiv.style.display = "none";
-        addXBubble("me", o.text, false);
-        setTimeout(() => {
-          addXBubble("them", o.reply, false);
-          setTimeout(() => { addXBubble("them", t.tw_meet2, false); showCounterAttack(); }, 2000);
-        }, 1500);
+        choicesDiv.style.display = "none"; addXBubble("me", o.text, false);
+        setTimeout(() => { addXBubble("them", o.reply, false); setTimeout(() => { addXBubble("them", t.tw_meet2, false); showCounterAttack(); }, 2000); }, 1500);
       };
       choicesDiv.appendChild(btn);
     });
@@ -324,26 +331,18 @@ function showSubChoices() {
 function showCounterAttack() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
-
   const inputBox = document.getElementById("xInputText");
   inputBox.style.opacity = "1"; inputBox.style.cursor = "pointer";
   inputBox.onclick = () => {
     inputBox.onclick = null; inputBox.style.opacity = "0.3"; inputBox.textContent = "";
-    
     const choicesDiv = document.getElementById("xChoices"); choicesDiv.style.display = "flex"; choicesDiv.innerHTML = "";
-    const btn = document.createElement("button"); 
-    btn.textContent = t.tw_def;
+    const btn = document.createElement("button"); btn.textContent = t.tw_def;
     btn.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer;";
-    
     btn.onclick = () => {
-      choicesDiv.style.display = "none";
-      addXBubble("me", btn.textContent, false);
+      choicesDiv.style.display = "none"; addXBubble("me", btn.textContent, false);
       setTimeout(() => {
         addXBubble("them", t.tw_final1, false);
-        setTimeout(() => {
-          addXBubble("them", t.tw_final2, false);
-          setTimeout(() => { showFinalChoices(); }, 2000);
-        }, 2000);
+        setTimeout(() => { addXBubble("them", t.tw_final2, false); setTimeout(() => { showFinalChoices(); }, 2000); }, 2000);
       }, 1500);
     };
     choicesDiv.appendChild(btn);
@@ -353,46 +352,34 @@ function showCounterAttack() {
 function showFinalChoices() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
-
   const inputBox = document.getElementById("xInputText");
   inputBox.style.opacity = "1"; inputBox.style.cursor = "pointer";
   inputBox.onclick = () => {
     inputBox.onclick = null; inputBox.style.opacity = "0.3"; inputBox.textContent = "";
-    
     const choicesDiv = document.getElementById("xChoices"); choicesDiv.style.display = "flex"; choicesDiv.innerHTML = "";
     
-    // 👇 选项1
-    const btn1 = document.createElement("button");
-    btn1.textContent = t.tw_f_opt1;
+    const btn1 = document.createElement("button"); btn1.textContent = t.tw_f_opt1;
     btn1.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer; margin-bottom:5px;";
     btn1.onclick = () => {
-      choicesDiv.style.display = "none";
-      addXBubble("me", btn1.textContent, false);
+      choicesDiv.style.display = "none"; addXBubble("me", btn1.textContent, false);
       setTimeout(() => {
         addXBubble("them", t.tw_f_rep1, false);
         setTimeout(() => {
           addXBubble("them", t.tw_f_rep2, false);
           setTimeout(() => {
             addXBubble("them", t.tw_f_rep3, false);
-            // 👇 选“你在哪”的分支，在这里触发 10 秒后的彩蛋！
-            setTimeout(() => { 
-  localStorage.setItem('kyoongUnlockTime', Date.now()); // 👈 加这一行：记录解锁时间
-  localStorage.removeItem('kyoongCleared');
-  localStorage.removeItem('kyoongHasChatted');
-  if(typeof triggerKyoongSMS === 'function') triggerKyoongSMS(); 
-}, 10000);
+            localStorage.setItem('kyoongUnlockTime', Date.now());
+            localStorage.removeItem('kyoongCleared');
+            setTimeout(() => { if(typeof triggerKyoongSMS === 'function') triggerKyoongSMS(); }, 10000);
           }, 2000);
         }, 2000);
       }, 1500);
     };
     
-    // 👇 选项2
-    const btn2 = document.createElement("button");
-    btn2.textContent = t.tw_f_opt2;
+    const btn2 = document.createElement("button"); btn2.textContent = t.tw_f_opt2;
     btn2.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer;";
     btn2.onclick = () => {
-      choicesDiv.style.display = "none";
-      addXBubble("me", btn2.textContent, false);
+      choicesDiv.style.display = "none"; addXBubble("me", btn2.textContent, false);
       setTimeout(() => {
         addXBubble("them", t.tw_f_rep4, false);
         setTimeout(() => {
@@ -400,25 +387,19 @@ function showFinalChoices() {
           setTimeout(() => {
             const choicesDiv2 = document.getElementById("xChoices");
             choicesDiv2.style.display = "flex"; choicesDiv2.innerHTML = "";
-            
-            // 👇 选项3（仅此一次）
-            const btn3 = document.createElement("button");
-            btn3.textContent = t.tw_f_opt3;
+            const btn3 = document.createElement("button"); btn3.textContent = t.tw_f_opt3;
             btn3.style.cssText = "background:#1d9bf0; color:#fff; border:none; border-radius:20px; padding:10px 16px; text-align:left; font-size:14px; cursor:pointer;";
             btn3.onclick = () => {
-              choicesDiv2.style.display = "none";
-              addXBubble("me", btn3.textContent, false);
+              choicesDiv2.style.display = "none"; addXBubble("me", btn3.textContent, false);
               setTimeout(() => {
                 addXBubble("them", t.tw_f_rep1, false);
                 setTimeout(() => {
                   addXBubble("them", t.tw_f_rep2, false);
                   setTimeout(() => {
                     addXBubble("them", t.tw_f_rep3, false);
-                    // 👇 选“算了吧” -> “仅此一次”的分支，也在这里触发 10 秒后的彩蛋！
-                    setTimeout(() => { 
-  localStorage.setItem('kyoongUnlockTime', Date.now()); // 👈 加这一行：记录解锁时间
-  if(typeof triggerKyoongSMS === 'function') triggerKyoongSMS(); 
-}, 10000);
+                    localStorage.setItem('kyoongUnlockTime', Date.now());
+                    localStorage.removeItem('kyoongCleared');
+                    setTimeout(() => { if(typeof triggerKyoongSMS === 'function') triggerKyoongSMS(); }, 10000);
                   }, 2000);
                 }, 2000);
               }, 1500);
@@ -428,7 +409,6 @@ function showFinalChoices() {
         }, 1500);
       }, 1500);
     };
-    
     choicesDiv.appendChild(btn1);
     choicesDiv.appendChild(btn2);
   };

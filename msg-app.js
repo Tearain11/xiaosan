@@ -178,192 +178,62 @@ function chooseMsg(text, nextStep) {
 
 // ================= kyoong 逻辑 =================
 function markKyoongAsRead() {
-  document.querySelectorAll('.kyoong-msg-status').forEach(el => { el.textContent = "已读"; el.style.color = "#8e8e93"; });
-  const preview = document.getElementById('kyoongPreview'); if(preview) preview.style.color = "#c7c7cc";
+  document.querySelectorAll('.kyoong-msg-status').forEach(el => { el.textContent = '已读'; el.style.color = '#8e8e93'; });
+  const preview = document.getElementById('kyoongPreview'); if (preview) preview.style.color = '#c7c7cc';
 }
-
-let kyoongStep = 0; 
-
+let kyoongStep = 0;
 function openKyoongChat() {
-  document.getElementById("kyoongRoom").style.display = "flex";
-  markKyoongAsRead();
-  const banner = document.getElementById("kyoong-banner"); if(banner) banner.style.opacity = "0";
-
-  const area = document.getElementById("kyoongArea");
-  if (area.innerHTML.trim() === "") {
-    addKyoongBubble("them", "姐姐，醒了吗？");
-    setTimeout(() => {
-      addKyoongBubble("them", "明明才分开几个小时，可是我好想你哦。");
-      setTimeout(() => {
-        addKyoongBubble("them", "看样子没醒啊.....T T");
-        setTimeout(() => {
-          addKyoongBubble("them", "不过我真的好开心，姐姐你居然真的愿意见我。觉得我怎么样呢？没有让姐姐失望吧。");
-          setTimeout(() => {
-            addKyoongBubble("them", "还有就是......你昨晚一直在求我慢一点的时候，声音真的很好听呢~");
-            kyoongStep = 1; 
-          }, 1500);
-        }, 1500);
-      }, 10000); 
-    }, 1000);
+  document.getElementById('kyoongRoom').style.display = 'flex'; markKyoongAsRead();
+  const banner = document.getElementById('kyoong-banner'); if (banner) banner.style.opacity = '0';
+  const area = document.getElementById('kyoongArea');
+  if (area.innerHTML.trim() === '') {
+    addKyoongBubble('them', '姐姐，醒了吗？');
+    setTimeout(() => addKyoongBubble('them', '明明才分开几个小时，可是我好想你哦。'), 1000);
+    setTimeout(() => addKyoongBubble('them', '看样子没醒啊.....T T'), 11000);
+    setTimeout(() => addKyoongBubble('them', '不过我真的好开心，姐姐你居然真的愿意见我。觉得我怎么样呢？没有让姐姐失望吧。'), 12500);
+    setTimeout(() => { addKyoongBubble('them', '还有就是......你昨晚一直在求我慢一点的时候，声音真的很好听呢~'); kyoongStep = 1; }, 14000);
   }
 }
-function closeKyoongChat() { document.getElementById("kyoongRoom").style.display = "none"; }
-
+function closeKyoongChat() { document.getElementById('kyoongRoom').style.display = 'none'; }
 function addKyoongBubble(from, text) {
-  const area = document.getElementById("kyoongArea");
-  const row = document.createElement("div");
-  row.style.display = "flex"; row.style.justifyContent = from === "them" ? "flex-start" : "flex-end"; row.style.alignItems = "flex-end"; row.style.gap = "5px";
-  if (from === "them") {
-    row.innerHTML = `<div style="background:#e5e5ea; color:#000; padding:10px 14px; border-radius:18px; font-size:15px; max-width:75%; line-height:1.4;">${text}</div><div class="kyoong-msg-status" style="font-size:11px; color:#007aff; margin-bottom:4px;">未读</div>`;
-  } else {
-    row.innerHTML = `<div style="font-size:11px; color:#8e8e93; margin-bottom:4px;">已读</div><div style="background:#007aff; color:#fff; padding:10px 14px; border-radius:18px; font-size:15px; max-width:75%; line-height:1.4;">${text}</div>`;
-  }
+  const area = document.getElementById('kyoongArea'); const row = document.createElement('div');
+  row.style.display = 'flex'; row.style.justifyContent = from === 'them' ? 'flex-start' : 'flex-end'; row.style.alignItems = 'flex-end'; row.style.gap = '5px';
+  if (from === 'them') row.innerHTML = `<div style="background:#e5e5ea;color:#000;padding:10px 14px;border-radius:18px;font-size:15px;max-width:75%;line-height:1.4;">${text}</div><div class="kyoong-msg-status" style="font-size:11px;color:#007aff;margin-bottom:4px;">未读</div>`;
+  else row.innerHTML = `<div style="font-size:11px;color:#8e8e93;margin-bottom:4px;">已读</div><div style="background:#007aff;color:#fff;padding:10px 14px;border-radius:18px;font-size:15px;max-width:75%;line-height:1.4;">${text}</div>`;
   area.appendChild(row); area.scrollTop = area.scrollHeight;
 }
-
 function triggerKyoongOptions() {
-  if (kyoongStep === 0) return;
-  markKyoongAsRead();
-  
-  const opts = document.getElementById("kyoongOptions"); 
-  opts.style.display = "flex"; opts.innerHTML = "";
-
-  if (kyoongStep === 1) {
-    kyoongStep = 0; 
-    const btn = document.createElement("button");
-    btn.textContent = "等一下....你怎么会有我的号码？？";
-    btn.style.cssText = "padding:12px; border-radius:12px; border:1px solid #007aff; background:#fff; color:#007aff; font-size:14px; text-align:left;";
-    btn.onclick = () => {
-      opts.style.display = "none"; 
-      addKyoongBubble("me", btn.textContent);
-      
-      setTimeout(() => {
-        addKyoongBubble("them", "姐姐你醒啦！");
-        setTimeout(() => {
-          addKyoongBubble("them", "我很贴心吧，在姐姐睡着了的时候就帮姐姐存好了我自己的号码。");
-          setTimeout(() => {
-            addKyoongBubble("them", "这样姐姐想我的时候就可以随时打给我了>_<");
-            kyoongStep = 2; 
-          }, 1500);
-        }, 1500);
-      }, 1500);
-    };
-    opts.appendChild(btn);
-  } 
-  else if (kyoongStep === 2) {
-    kyoongStep = 0;
-    const btn = document.createElement("button");
-    btn.textContent = "而且这个头像和备注是什么情况？？？";
-    btn.style.cssText = "padding:12px; border-radius:12px; border:1px solid #007aff; background:#fff; color:#007aff; font-size:14px; text-align:left;";
-    btn.onclick = () => {
-      opts.style.display = "none";
-      addKyoongBubble("me", "而且这个头像和备注是什么情况？？？");
-      const lines = [
-        ["them", "这么明显吗？"],
-        ["me", "你觉得呢？"],
-        ["them", "姐姐不是已经看到了吗。"],
-        ["them", "还要我亲口承认呀？"],
-        ["me", "边伯贤，你能不能好好说话。"],
-        ["them", "好嘛～"],
-        ["them", "那姐姐呢？"],
-        ["them", "你打算怎么处理我们之间的事？"]
-      ];
-      let i = 0;
-      const nextLine = () => {
-        if (i >= lines.length) {
-          kyoongStep = 3;
-          return;
-        }
-        const [from, text] = lines[i++];
-        setTimeout(() => {
-          addKyoongBubble(from, text);
-          nextLine();
-        }, 900);
-      };
-      nextLine();
-    };
-    opts.appendChild(btn);
-  }
-  else if (kyoongStep === 3) {
-    const choices = [
-      { text: "我觉得我们还是不要再联系了。昨天的事，就当作没发生过吧。", route: "ending1" },
-      { text: "其实……我想了很久。从答应和你见面的那一刻起，我就一直在想这件事。", route: "continue" }
-    ];
-    choices.forEach(choice => {
-      const btn = document.createElement("button");
-      btn.textContent = choice.text;
-      btn.style.cssText = "padding:12px; border-radius:12px; border:1px solid #007aff; background:#fff; color:#007aff; font-size:14px; text-align:left; line-height:1.45;";
-      btn.onclick = () => {
-        opts.style.display = "none";
-        if (choice.route === "ending1") {
-          addKyoongBubble("me", choice.text);
-          const replies = [
-            "我知道了姐姐。",
-            "对不起，是我不该这样逾越。",
-            "是我太贪心了。",
-            "我不会再打扰你了，姐姐。",
-            "祝你幸福。"
-          ];
-          let i = 0;
-          const nextReply = () => {
-            if (i >= replies.length) {
-              const area = document.getElementById("kyoongArea");
-              const card = document.createElement("div");
-              card.style.cssText = "margin:16px 4px;padding:22px 18px;border-radius:18px;background:#171717;color:#fff;text-align:center;line-height:1.8;";
-              card.innerHTML = '<div style="font-size:12px;letter-spacing:3px;color:#b9b9b9;margin-bottom:10px;">ENDING 01</div><div style="font-size:24px;font-weight:700;margin-bottom:18px;">到此为止</div><div style="font-size:14px;text-align:left;white-space:pre-line;">有些错误，在发生之后才终于显露出它的重量。\n\n你选择停在这里，不再让一时的冲动成为继续伤害别人的理由。</div><div style="font-size:12px;color:#b9b9b9;margin-top:20px;">本次故事已结束</div>';
-              area.appendChild(card);
-              area.scrollTop = area.scrollHeight;
-              kyoongStep = 0;
-              return;
-            }
-            setTimeout(() => {
-              addKyoongBubble("them", replies[i++]);
-              nextReply();
-            }, 900);
-          };
-          nextReply();
-        } else {
-          const heroineLines = [
-            "其实……我想了很久。",
-            "从答应和你见面的那一刻起，我就一直在想这件事。",
-            "我知道自己有男朋友，昨天答应见面的时候，也知道这意味着什么。",
-            "但是我现在想好了。",
-            "如果你不介意的话，我们以后还可以像昨天那样见面吗？",
-            "我没办法和你谈恋爱，这个很抱歉。",
-            "只是……如果你也愿意的话，我们可以暂时维持现在这样的关系。"
-          ];
-          let i = 0;
-          const nextHeroineLine = () => {
-            if (i >= heroineLines.length) {
-              const replies = [
-                "姐姐真的想好了？",
-                "我还以为，姐姐会让我以后都不要再找你了。",
-                "不过，既然是姐姐主动说的……",
-                "那我当然愿意啊。"
-              ];
-              let j = 0;
-              const nextBaekLine = () => {
-                if (j >= replies.length) {
-                  kyoongStep = 0;
-                  return;
-                }
-                setTimeout(() => {
-                  addKyoongBubble("them", replies[j++]);
-                  nextBaekLine();
-                }, 1000);
-              };
-              nextBaekLine();
-              return;
-            }
-            setTimeout(() => {
-              addKyoongBubble("me", heroineLines[i++]);
-              nextHeroineLine();
-            }, 900);
-          };
-          nextHeroineLine();
-        }
-      };
-      opts.appendChild(btn);
+  if (!kyoongStep) return; markKyoongAsRead();
+  const opts = document.getElementById('kyoongOptions'); opts.style.display = 'flex'; opts.innerHTML = '';
+  const addChoice = (label, handler) => { const btn = document.createElement('button'); btn.textContent = label; btn.style.cssText = 'padding:12px;border-radius:12px;border:1px solid #007aff;background:#fff;color:#007aff;font-size:14px;text-align:left;line-height:1.45;'; btn.onclick = () => { opts.style.display = 'none'; handler(); }; opts.appendChild(btn); };
+  if (kyoongStep === 1) addChoice('等一下....你怎么会有我的号码？？', () => {
+    addKyoongBubble('me', '等一下....你怎么会有我的号码？？');
+    setTimeout(() => addKyoongBubble('them', '姐姐你醒啦！'), 900);
+    setTimeout(() => addKyoongBubble('them', '我很贴心吧，在姐姐睡着了的时候就帮姐姐存好了我自己的号码。'), 1800);
+    setTimeout(() => { addKyoongBubble('them', '这样姐姐想我的时候就可以随时打给我了>_<'); kyoongStep = 2; }, 2700);
+  });
+  else if (kyoongStep === 2) addChoice('而且这个头像和备注是什么情况？？？', () => { addKyoongBubble('me', '而且这个头像和备注是什么情况？？？'); setTimeout(() => { addKyoongBubble('them', '这么明显吗？'); kyoongStep = 3; }, 900); });
+  else if (kyoongStep === 3) addChoice('你觉得呢？', () => { addKyoongBubble('me', '你觉得呢？'); setTimeout(() => addKyoongBubble('them', '姐姐不是已经看到了吗。'), 900); setTimeout(() => { addKyoongBubble('them', '还要我亲口承认呀？'); kyoongStep = 4; }, 1800); });
+  else if (kyoongStep === 4) addChoice('边伯贤，你能不能好好说话。', () => { addKyoongBubble('me', '边伯贤，你能不能好好说话。'); setTimeout(() => addKyoongBubble('them', '好嘛～'), 900); setTimeout(() => addKyoongBubble('them', '那姐姐呢？'), 1800); setTimeout(() => { addKyoongBubble('them', '你打算怎么处理我们之间的事？'); kyoongStep = 5; }, 2700); });
+  else if (kyoongStep === 5) {
+    addChoice('我觉得我们还是不要再联系了。昨天的事，就当作没发生过吧。', () => {
+      addKyoongBubble('me', '我觉得我们还是不要再联系了。昨天的事，就当作没发生过吧。');
+      const replies = ['我知道了姐姐。', '对不起，是我不该这样逾越。', '是我太贪心了。', '我不会再打扰你了，姐姐。', '祝你幸福。'];
+      replies.forEach((line, i) => setTimeout(() => { addKyoongBubble('them', line); if (i === replies.length - 1) setTimeout(showKyoongEnding, 700); }, 1000 * (i + 1))); kyoongStep = 0;
+    });
+    addChoice('其实……我想了很久。从答应和你见面的那一刻起，我就一直在想这件事。', () => {
+      const heroine = ['其实……我想了很久。', '从答应和你见面的那一刻起，我就一直在想这件事。', '我知道自己有男朋友，昨天答应见面的时候，也知道这意味着什么。', '但是我现在想好了。', '如果你不介意的话，我们以后还可以像昨天那样见面吗？', '我没办法和你谈恋爱，这个很抱歉。', '只是……如果你也愿意的话，我们可以暂时维持现在这样的关系。'];
+      const replies = ['姐姐真的想好了？', '我还以为，姐姐会让我以后都不要再找你了。', '不过，既然是姐姐主动说的……', '那我当然愿意啊。'];
+      heroine.forEach((line, i) => setTimeout(() => addKyoongBubble('me', line), 700 * (i + 1))); replies.forEach((line, i) => setTimeout(() => addKyoongBubble('them', line), 700 * (heroine.length + i + 1))); kyoongStep = 0;
     });
   }
+}
+function showKyoongEnding() {
+  let ending = document.getElementById('kyoong-ending-screen');
+  if (!ending) {
+    ending = document.createElement('div'); ending.id = 'kyoong-ending-screen';
+    ending.style.cssText = 'position:absolute;inset:0;z-index:100000;background:#111;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;box-sizing:border-box;';
+    ending.innerHTML = '<div style="font-size:12px;letter-spacing:4px;color:#b9b9b9;margin-bottom:14px;">ENDING 01</div><div style="font-size:30px;font-weight:700;margin-bottom:24px;">到此为止</div><div style="font-size:15px;line-height:2;text-align:left;max-width:340px;">有些错误，在发生之后才终于显露出它的重量。<br><br>你选择停在这里，不再让一时的冲动成为继续伤害别人的理由。</div><div style="font-size:12px;color:#b9b9b9;margin-top:28px;">本次故事已结束</div><button id="kyoong-ending-return" style="margin-top:36px;padding:11px 24px;border:1px solid #777;border-radius:22px;background:transparent;color:#fff;font-size:14px;">返回手机</button>';
+    document.getElementById('phone').appendChild(ending); document.getElementById('kyoong-ending-return').onclick = () => { ending.remove(); closeKyoongChat(); };
+  } else ending.style.display = 'flex';
 }

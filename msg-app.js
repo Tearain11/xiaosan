@@ -263,14 +263,119 @@ function triggerKyoongOptions() {
     opts.appendChild(btn);
   } 
   else if (kyoongStep === 2) {
-    kyoongStep = 0; 
+    kyoongStep = 0;
     const btn = document.createElement("button");
-    btn.textContent = "而且这个头像和备注又是什么情况？？？";
+    btn.textContent = "而且这个头像和备注是什么情况？？？";
     btn.style.cssText = "padding:12px; border-radius:12px; border:1px solid #007aff; background:#fff; color:#007aff; font-size:14px; text-align:left;";
-    btn.onclick = () => { 
-      opts.style.display = "none"; 
-      addKyoongBubble("me", btn.textContent); 
+    btn.onclick = () => {
+      opts.style.display = "none";
+      addKyoongBubble("me", "而且这个头像和备注是什么情况？？？");
+      const lines = [
+        ["them", "这么明显吗？"],
+        ["me", "你觉得呢？"],
+        ["them", "姐姐不是已经看到了吗。"],
+        ["them", "还要我亲口承认呀？"],
+        ["me", "边伯贤，你能不能好好说话。"],
+        ["them", "好嘛～"],
+        ["them", "那姐姐呢？"],
+        ["them", "你打算怎么处理我们之间的事？"]
+      ];
+      let i = 0;
+      const nextLine = () => {
+        if (i >= lines.length) {
+          kyoongStep = 3;
+          return;
+        }
+        const [from, text] = lines[i++];
+        setTimeout(() => {
+          addKyoongBubble(from, text);
+          nextLine();
+        }, 900);
+      };
+      nextLine();
     };
     opts.appendChild(btn);
+  }
+  else if (kyoongStep === 3) {
+    const choices = [
+      { text: "我觉得我们还是不要再联系了。昨天的事，就当作没发生过吧。", route: "ending1" },
+      { text: "其实……我想了很久。从答应和你见面的那一刻起，我就一直在想这件事。", route: "continue" }
+    ];
+    choices.forEach(choice => {
+      const btn = document.createElement("button");
+      btn.textContent = choice.text;
+      btn.style.cssText = "padding:12px; border-radius:12px; border:1px solid #007aff; background:#fff; color:#007aff; font-size:14px; text-align:left; line-height:1.45;";
+      btn.onclick = () => {
+        opts.style.display = "none";
+        if (choice.route === "ending1") {
+          addKyoongBubble("me", choice.text);
+          const replies = [
+            "我知道了姐姐。",
+            "对不起，是我不该这样逾越。",
+            "是我太贪心了。",
+            "我不会再打扰你了，姐姐。",
+            "祝你幸福。"
+          ];
+          let i = 0;
+          const nextReply = () => {
+            if (i >= replies.length) {
+              const area = document.getElementById("kyoongArea");
+              const card = document.createElement("div");
+              card.style.cssText = "margin:16px 4px;padding:22px 18px;border-radius:18px;background:#171717;color:#fff;text-align:center;line-height:1.8;";
+              card.innerHTML = '<div style="font-size:12px;letter-spacing:3px;color:#b9b9b9;margin-bottom:10px;">ENDING 01</div><div style="font-size:24px;font-weight:700;margin-bottom:18px;">到此为止</div><div style="font-size:14px;text-align:left;white-space:pre-line;">有些错误，在发生之后才终于显露出它的重量。\n\n你选择停在这里，不再让一时的冲动成为继续伤害别人的理由。</div><div style="font-size:12px;color:#b9b9b9;margin-top:20px;">本次故事已结束</div>';
+              area.appendChild(card);
+              area.scrollTop = area.scrollHeight;
+              kyoongStep = 0;
+              return;
+            }
+            setTimeout(() => {
+              addKyoongBubble("them", replies[i++]);
+              nextReply();
+            }, 900);
+          };
+          nextReply();
+        } else {
+          const heroineLines = [
+            "其实……我想了很久。",
+            "从答应和你见面的那一刻起，我就一直在想这件事。",
+            "我知道自己有男朋友，昨天答应见面的时候，也知道这意味着什么。",
+            "但是我现在想好了。",
+            "如果你不介意的话，我们以后还可以像昨天那样见面吗？",
+            "我没办法和你谈恋爱，这个很抱歉。",
+            "只是……如果你也愿意的话，我们可以暂时维持现在这样的关系。"
+          ];
+          let i = 0;
+          const nextHeroineLine = () => {
+            if (i >= heroineLines.length) {
+              const replies = [
+                "姐姐真的想好了？",
+                "我还以为，姐姐会让我以后都不要再找你了。",
+                "不过，既然是姐姐主动说的……",
+                "那我当然愿意啊。"
+              ];
+              let j = 0;
+              const nextBaekLine = () => {
+                if (j >= replies.length) {
+                  kyoongStep = 0;
+                  return;
+                }
+                setTimeout(() => {
+                  addKyoongBubble("them", replies[j++]);
+                  nextBaekLine();
+                }, 1000);
+              };
+              nextBaekLine();
+              return;
+            }
+            setTimeout(() => {
+              addKyoongBubble("me", heroineLines[i++]);
+              nextHeroineLine();
+            }, 900);
+          };
+          nextHeroineLine();
+        }
+      };
+      opts.appendChild(btn);
+    });
   }
 }

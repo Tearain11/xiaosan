@@ -25,7 +25,8 @@ html, body { height: 100%; margin: 0; overflow: hidden; background: #111; color:
 .lock-time { font-size: 96px; font-weight: 700; letter-spacing: -2px; color: transparent; -webkit-text-stroke: 2.5px rgba(255,255,255,0.75); margin-top: -5px; }
 .lock-footer { margin-top: auto; padding: 0 40px 50px; display: flex; justify-content: space-between; }
 .lock-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 24px; }
-.lock-homebar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff; }
+.lock-homebar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff; cursor: pointer; }
+.lock-hint { position: absolute; bottom: 28px; left: 0; right: 0; text-align: center; font-size: 12px; letter-spacing: .5px; color: rgba(255,255,255,.9); text-shadow: 0 1px 4px rgba(0,0,0,.5); pointer-events: none; }
 #lock-banner { position: absolute; top: 35%; left: 16px; right: 16px; background: rgba(50,50,50,0.6); backdrop-filter: blur(25px); border-radius: 20px; padding: 14px 16px; display: flex; gap: 12px; transform: scale(0.9); opacity: 0; transition: all 0.4s; z-index: 10000; border: 1px solid rgba(255,255,255,0.1); }
 #lock-banner.show { transform: scale(1); opacity: 1; }
 #lock-banner img { width: 42px; height: 42px; border-radius: 8px; object-fit: cover; }

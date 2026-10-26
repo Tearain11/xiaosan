@@ -207,11 +207,15 @@ html, body { height: 100%; margin: 0; overflow: hidden; background: #111; color:
 .ios-calendar-weekdays span { padding:8px 0; }
 .ios-calendar-date { height:42px; display:flex; justify-content:center; align-items:center; font-size:16px; color:#1c1c1e; position:relative; }
 .ios-calendar-date.outside { color:#c7c7cc; }
-.ios-calendar-date.today { color:#fff; font-weight:600; }
-.ios-calendar-date.today::before { content:""; position:absolute; z-index:0; width:32px; height:32px; border-radius:50%; background:#007aff; }
-.ios-calendar-date.today { isolation:isolate; }
-.ios-calendar-date.today::before { z-index:-1; }
 .ios-calendar-divider { height:1px; background:#e5e5ea; margin:20px 0 22px; }
 .ios-calendar-agenda-title { font-size:21px; font-weight:700; margin-bottom:16px; }
 .ios-calendar-empty { display:flex; align-items:center; gap:12px; padding:16px 0; color:#8e8e93; font-size:14px; border-top:1px solid #f2f2f7; }
 .ios-calendar-empty-dot { width:8px; height:8px; border-radius:50%; background:#007aff; }
+
+/* 剧情日历列表 */
+.story-days-list { margin-top: 4px; }
+.story-day-row { display:flex; align-items:center; gap:13px; min-height:62px; border-top:1px solid #f2f2f7; }
+.story-day-icon { width:40px; height:40px; border-radius:12px; background:#f2f2f7; display:flex; align-items:center; justify-content:center; color:#007aff; font-size:16px; font-weight:600; flex-shrink:0; }
+.story-day-label { flex:1; font-size:16px; color:#1c1c1e; font-weight:500; }
+.story-day-status { width:26px; display:flex; justify-content:center; align-items:center; }
+.story-day-check { color:#34c759; font-size:24px; font-weight:600; }

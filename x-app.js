@@ -1,22 +1,9 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
-  // 每次进入 X 时重置主推文点赞状态；避免旧 DOM / CSS 把剧情触发按钮锁住。
-  localStorage.removeItem("xLiked");
-  window.hasLiked = false;
-  if (container.innerHTML.trim() !== "") {
-    ["like-btn-home", "like-btn-baek"].forEach(id => {
-      const btn = document.getElementById(id);
-      if (btn) {
-        btn.classList.remove("liked");
-        btn.style.color = "#71767b";
-        btn.innerHTML = "🤍 8.65万";
-        btn.onclick = function () { triggerLike(this, "8.65万", true); };
-      }
-    });
-    return;
-  }
+  // 同一轮游戏中再次打开 X 时保留当前 DOM、点赞与私信进度。
+  if (container.innerHTML.trim() !== "") return;
 
-  // 保留点赞、私信与剧情解锁状态；需要重开剧情时应使用明确的重置入口。
+  // 整个网站重新加载时，main.js 会统一清除上一轮游戏的剧情存档。
 
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];

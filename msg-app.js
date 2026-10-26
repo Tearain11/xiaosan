@@ -241,19 +241,22 @@ function triggerKyoongOptions() {
     btn.textContent = "等一下....你怎么会有我的号码？？";
     btn.style.cssText = "padding:12px; border-radius:12px; border:1px solid #007aff; background:#fff; color:#007aff; font-size:14px; text-align:left;";
     btn.onclick = () => {
-      opts.style.display = "none"; 
-      addKyoongBubble("me", btn.textContent);
-      
+      opts.style.display = "none";
+      // 玩家连续发送两条消息，发送完毕后 kyoong 才回复。
+      addKyoongBubble("me", "等一下....你怎么会有我的号码？？");
       setTimeout(() => {
-        addKyoongBubble("them", "姐姐你醒啦！");
+        addKyoongBubble("me", "而且这个头像和备注又是什么情况？？？");
         setTimeout(() => {
-          addKyoongBubble("them", "我很贴心吧，在姐姐睡着了的时候就帮姐姐存好了我自己的号码。");
+          addKyoongBubble("them", "姐姐你醒啦！");
           setTimeout(() => {
-            addKyoongBubble("them", "这样姐姐想我的时候就可以随时打给我了>_<");
-            kyoongStep = 2; localStorage.setItem("kyoongStep", "2"); 
+            addKyoongBubble("them", "我很贴心吧，在姐姐睡着了的时候就帮姐姐存好了我自己的号码。");
+            setTimeout(() => {
+              addKyoongBubble("them", "这样姐姐想我的时候就可以随时打给我了>_<");
+              kyoongStep = 2; localStorage.setItem("kyoongStep", "2");
+            }, 1500);
           }, 1500);
-        }, 1500);
-      }, 1500);
+        }, 500);
+      }, 500);
     };
     opts.appendChild(btn);
   } 

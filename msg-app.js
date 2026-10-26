@@ -248,6 +248,8 @@ function triggerKyoongOptions() {
   }
 }
 function showKyoongEnding() {
+  // 任意路线抵达结局时，标记当天剧情完成；不向日历泄露具体结局内容。
+  localStorage.setItem("dayOneFinished", "true");
   let ending = document.getElementById('kyoong-ending-screen');
   if (!ending) {
     ending = document.createElement('div'); ending.id = 'kyoong-ending-screen';

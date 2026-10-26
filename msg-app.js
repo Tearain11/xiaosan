@@ -157,7 +157,7 @@ function openMsgChat() {
     ['宝宝，今天下午有空吗？','昨天是我不好，不应该把你一个人晾在那里。','这几天一直忙着自己的事，都没怎么好好陪你。','所以今天下午留给我，好不好？','带你去吃你之前收藏了很久的那家餐厅，吃完再陪你逛街。上次你看中的东西不是还没买吗？这次不许再说不要了。','就当是我给你赔罪。','宝宝，给我一个机会，好不好？'].forEach(line => addMsgBubble('them', line));
     localStorage.setItem('dayTwoBoyfriendChatFinished', 'true');
     if (typeof showDayTwoBaekNotification === 'function') setTimeout(showDayTwoBaekNotification, 650);
-  } else if (area.innerHTML.trim() === '') {
+  } else if (area.innerHTML.trim() === '' && localStorage.getItem('dayTwoInviteSequenceStarted') !== 'true') {
     addMsgBubble('them', '宝宝抱歉，临时要开会，今晚的约会去不了了。'); msgStep = 1;
   }
   if (localStorage.getItem('dayTwoBaekNoticeSent') === 'true') renderDayTwoBoyfriendChoices();
@@ -223,6 +223,8 @@ function openKyoongChat() {
     setTimeout(() => addKyoongBubble('them', '不过我真的好开心，姐姐你居然真的愿意见我。觉得我怎么样呢？没有让姐姐失望吧。'), 12500);
     setTimeout(() => { addKyoongBubble('them', '还有就是......你昨晚一直在求我慢一点的时候，声音真的很好听呢~'); kyoongStep = 1; }, 14000);
   }
+  if (localStorage.getItem('dayTwoBaekNoticeSent') === 'true') renderDayTwoBaekChoices();
+  saveStoryProgressNow();
 }
 function closeKyoongChat() { document.getElementById('kyoongRoom').style.display = 'none'; }
 function addKyoongBubble(from, text) {

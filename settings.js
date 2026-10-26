@@ -130,10 +130,25 @@ function selectLanguage(langCode) {
 
 function lockPhone() {
   document.querySelectorAll(".app-page").forEach(s => s.classList.remove("active"));
-  document.getElementById("lock").classList.remove("unlocked");
-  document.getElementById("lock-banner").classList.remove("show");
-  const msgBanner = document.getElementById("lock-msg-banner");
-  if(msgBanner) msgBanner.style.opacity = "0";
+  const lock = document.getElementById("lock");
+  const lockMain = document.getElementById("lock-main");
+  const passcodeScreen = document.getElementById("passcode-screen");
+  if (lock) lock.classList.remove("unlocked");
+  if (typeof currentPin !== "undefined") currentPin = "";
+  if (typeof updateDots === "function") updateDots();
+  if (lockMain) lockMain.classList.remove("passcode-active");
+  if (passcodeScreen) passcodeScreen.classList.remove("active");
+  const error = document.getElementById("passcode-error");
+  if (error) error.classList.remove("show");
+  const xBanner = document.getElementById("lock-banner");
+  if (xBanner) xBanner.classList.remove("show");
+  ["lock-msg-banner", "kyoong-banner"].forEach(id => {
+    const banner = document.getElementById(id);
+    if (banner) {
+      banner.style.opacity = "0";
+      banner.style.transform = "translateY(-150%)";
+    }
+  });
 }
 
 function clearMemory(confirmText) {

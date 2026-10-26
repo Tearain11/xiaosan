@@ -175,12 +175,9 @@ function initXApp() {
       <div id="xChoices" style="display:none; flex-direction:column; gap:6px; padding:10px 16px 30px; background:#000;"></div>
     </div>
   `;
-  if (localStorage.getItem("xLiked") === "true") {
-    document.querySelectorAll('[id^="like-btn-"]').forEach(btn => {
-      btn.classList.add("liked"); btn.style.color = "#f91880";
-      if (btn.id === "like-btn-baek" || btn.id === "like-btn-home") btn.innerHTML = "❤️ 8.65万";
-    });
-  }
+  // 点赞是本轮剧情的触发动作，不从 localStorage 恢复成已点赞，
+  // 否则刷新/重新测试时按钮会被锁住，无法再次触发剧情。
+  localStorage.removeItem("xLiked");
 }
 
 function switchXTab(tabId) {
@@ -216,7 +213,6 @@ function uploadUserImg(input, imgId, placeholderId) {
 function triggerLike(element, originalCount, isMainTweet) {
   if (element.classList.contains("liked")) return;
   element.classList.add("liked"); element.innerHTML = `❤️ ${originalCount}`; element.style.color = "#f91880";
-  if (isMainTweet) localStorage.setItem("xLiked", "true");
   
   if (isMainTweet && !window.hasLiked) {
     window.hasLiked = true;

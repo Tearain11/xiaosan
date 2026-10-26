@@ -8,7 +8,7 @@ function initMsgApp() {
   // 时间锁
   let unlockTime = parseInt(localStorage.getItem('kyoongUnlockTime') || '0');
   let isKyoongUnlocked = false;
-  if (unlockTime > 0 && (Date.now() - unlockTime < 3600000)) {
+  if (unlockTime > 0 || localStorage.getItem("kyoongCleared") === "true") {
     isKyoongUnlocked = true;
   }
 
@@ -62,8 +62,7 @@ function initMsgApp() {
       <div id="fakeInputBar" onclick="triggerMsgOptions()" style="padding:10px 16px 34px; background:#fff; border-top:1px solid #eee; align-items:center; gap:10px; display:flex; cursor:pointer;">
         <div style="flex:1; background:#f2f2f7; border-radius:20px; padding:10px 15px; color:#c7c7cc; font-size:15px;">iMessage</div>
       </div>
-      <!-- 隐形回桌面热区 -->
-      <div onclick="document.querySelectorAll('.app-page').forEach(s=>s.classList.remove('active'))" style="position:absolute; bottom:0; left:0; right:0; height:30px; z-index:99999; cursor:pointer;"></div>
+
     </div>
 
     <!-- kyoong 聊天室 -->
@@ -81,10 +80,16 @@ function initMsgApp() {
       <div id="kyoongFakeInput" onclick="triggerKyoongOptions()" style="padding:10px 16px 34px; background:#fff; border-top:1px solid #eee; align-items:center; gap:10px; display:flex; cursor:pointer;">
         <div style="flex:1; background:#f2f2f7; border-radius:20px; padding:10px 15px; color:#c7c7cc; font-size:15px;">iMessage</div>
       </div>
-      <!-- 隐形回桌面热区 -->
-      <div onclick="document.querySelectorAll('.app-page').forEach(s=>s.classList.remove('active'))" style="position:absolute; bottom:0; left:0; right:0; height:30px; z-index:99999; cursor:pointer;"></div>
+
     </div>
   `;
+
+  const savedMsgHtml = localStorage.getItem("msgChatHtml");
+  const savedKyoongHtml = localStorage.getItem("kyoongChatHtml");
+  if (savedMsgHtml) document.getElementById("chatArea").innerHTML = savedMsgHtml;
+  if (savedKyoongHtml) document.getElementById("kyoongArea").innerHTML = savedKyoongHtml;
+  msgStep = Number(localStorage.getItem("msgStep") || 0);
+  kyoongStep = Number(localStorage.getItem("kyoongStep") || 0);
 
   if (!document.getElementById("lock-msg-banner")) {
     const banner = document.createElement("div");
@@ -118,7 +123,7 @@ function triggerKyoongSMS() {
 }
 
 // ================= 男朋友聊天逻辑 =================
-let msgStep = 0;
+let msgStep = Number(localStorage.getItem("msgStep") || 0);
 
 function openMsgChat() {
   document.getElementById("chatRoom").style.display = "flex";
@@ -145,6 +150,7 @@ function addMsgBubble(from, text) {
     row.innerHTML = `<div style="font-size:11px; color:#8e8e93; margin-bottom:4px;">已读</div><div style="background:#007aff; color:#fff; padding:10px 14px; border-radius:18px; font-size:15px; max-width:75%; line-height:1.4;">${text}</div>`;
   }
   area.appendChild(row); area.scrollTop = area.scrollHeight;
+  try { localStorage.setItem("msgChatHtml", area.innerHTML); } catch (e) { console.warn("Could not save SMS history", e); }
 }
 
 function triggerMsgOptions() {
@@ -167,10 +173,10 @@ function triggerMsgOptions() {
 
 function chooseMsg(text, nextStep) {
   document.getElementById("msgOptions").style.display = "none";
-  msgStep = 0; 
+  msgStep = 0; localStorage.setItem("msgStep", "0");
   if (text !== '（已读不回）') addMsgBubble("me", text);
   if (nextStep === 2) {
-    setTimeout(() => { addMsgBubble("them", "宝宝别闹了，领导在催了，我先去忙了。"); msgStep = 2; }, 1200);
+    setTimeout(() => { addMsgBubble("them", "宝宝别闹了，领导在催了，我先去忙了。"); msgStep = 2; localStorage.setItem("msgStep", "2"); }, 1200);
   } else if (nextStep === 3) {
     setTimeout(() => { addMsgBubble("them", "下次我一定补偿你，早点睡。"); }, 1200);
   }
@@ -182,7 +188,7 @@ function markKyoongAsRead() {
   const preview = document.getElementById('kyoongPreview'); if(preview) preview.style.color = "#c7c7cc";
 }
 
-let kyoongStep = 0; 
+let kyoongStep = Number(localStorage.getItem("kyoongStep") || 0); 
 
 function openKyoongChat() {
   document.getElementById("kyoongRoom").style.display = "flex";
@@ -200,7 +206,7 @@ function openKyoongChat() {
           addKyoongBubble("them", "不过我真的好开心，姐姐你居然真的愿意见我。觉得我怎么样呢？没有让姐姐失望吧。");
           setTimeout(() => {
             addKyoongBubble("them", "还有就是......你昨晚一直在求我慢一点的时候，声音真的很好听呢~");
-            kyoongStep = 1; 
+            kyoongStep = 1; localStorage.setItem("kyoongStep", "1"); 
           }, 1500);
         }, 1500);
       }, 10000); 
@@ -219,6 +225,7 @@ function addKyoongBubble(from, text) {
     row.innerHTML = `<div style="font-size:11px; color:#8e8e93; margin-bottom:4px;">已读</div><div style="background:#007aff; color:#fff; padding:10px 14px; border-radius:18px; font-size:15px; max-width:75%; line-height:1.4;">${text}</div>`;
   }
   area.appendChild(row); area.scrollTop = area.scrollHeight;
+  try { localStorage.setItem("kyoongChatHtml", area.innerHTML); } catch (e) { console.warn("Could not save kyoong history", e); }
 }
 
 function triggerKyoongOptions() {
@@ -229,29 +236,32 @@ function triggerKyoongOptions() {
   opts.style.display = "flex"; opts.innerHTML = "";
 
   if (kyoongStep === 1) {
-    kyoongStep = 0; 
+    kyoongStep = 0; localStorage.setItem("kyoongStep", "0"); 
     const btn = document.createElement("button");
     btn.textContent = "等一下....你怎么会有我的号码？？";
     btn.style.cssText = "padding:12px; border-radius:12px; border:1px solid #007aff; background:#fff; color:#007aff; font-size:14px; text-align:left;";
     btn.onclick = () => {
-      opts.style.display = "none"; 
-      addKyoongBubble("me", btn.textContent);
-      
+      opts.style.display = "none";
+      // 玩家连续发送两条消息，发送完毕后 kyoong 才回复。
+      addKyoongBubble("me", "等一下....你怎么会有我的号码？？");
       setTimeout(() => {
-        addKyoongBubble("them", "姐姐你醒啦！");
+        addKyoongBubble("me", "而且这个头像和备注又是什么情况？？？");
         setTimeout(() => {
-          addKyoongBubble("them", "我很贴心吧，在姐姐睡着了的时候就帮姐姐存好了我自己的号码。");
+          addKyoongBubble("them", "姐姐你醒啦！");
           setTimeout(() => {
-            addKyoongBubble("them", "这样姐姐想我的时候就可以随时打给我了>_<");
-            kyoongStep = 2; 
+            addKyoongBubble("them", "我很贴心吧，在姐姐睡着了的时候就帮姐姐存好了我自己的号码。");
+            setTimeout(() => {
+              addKyoongBubble("them", "这样姐姐想我的时候就可以随时打给我了>_<");
+              kyoongStep = 2; localStorage.setItem("kyoongStep", "2");
+            }, 1500);
           }, 1500);
-        }, 1500);
-      }, 1500);
+        }, 500);
+      }, 500);
     };
     opts.appendChild(btn);
   } 
   else if (kyoongStep === 2) {
-    kyoongStep = 0; 
+    kyoongStep = 0; localStorage.setItem("kyoongStep", "0"); 
     const btn = document.createElement("button");
     btn.textContent = "而且这个头像和备注又是什么情况？？？";
     btn.style.cssText = "padding:12px; border-radius:12px; border:1px solid #007aff; background:#fff; color:#007aff; font-size:14px; text-align:left;";

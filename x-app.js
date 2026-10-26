@@ -175,6 +175,12 @@ function initXApp() {
       <div id="xChoices" style="display:none; flex-direction:column; gap:6px; padding:10px 16px 30px; background:#000;"></div>
     </div>
   `;
+  if (localStorage.getItem("xLiked") === "true") {
+    document.querySelectorAll('[id^="like-btn-"]').forEach(btn => {
+      btn.classList.add("liked"); btn.style.color = "#f91880";
+      if (btn.id === "like-btn-baek" || btn.id === "like-btn-home") btn.innerHTML = "❤️ 8.65万";
+    });
+  }
 }
 
 function switchXTab(tabId) {
@@ -210,6 +216,7 @@ function uploadUserImg(input, imgId, placeholderId) {
 function triggerLike(element, originalCount, isMainTweet) {
   if (element.classList.contains("liked")) return;
   element.classList.add("liked"); element.innerHTML = `❤️ ${originalCount}`; element.style.color = "#f91880";
+  if (isMainTweet) localStorage.setItem("xLiked", "true");
   
   if (isMainTweet && !window.hasLiked) {
     window.hasLiked = true;
@@ -242,8 +249,20 @@ function closeXChat() { document.getElementById('x-chatroom').style.display = 'n
 function startXChat() {
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
-  const area = document.getElementById("xChatArea"); area.innerHTML = "";
-  const inputBox = document.getElementById("xInputText"); inputBox.style.opacity = "0.5"; inputBox.style.cursor = "default"; inputBox.onclick = null;
+  const area = document.getElementById("xChatArea");
+  const inputBox = document.getElementById("xInputText");
+  const savedHistory = JSON.parse(localStorage.getItem("xChatHistory") || "[]");
+  if (savedHistory.length) {
+    area.innerHTML = "";
+    savedHistory.forEach(item => addXBubble(item.from, item.text, false, false));
+    const finished = localStorage.getItem("xChatFinished") === "true";
+    inputBox.style.opacity = finished ? "0.5" : "1";
+    inputBox.style.cursor = finished ? "default" : "pointer";
+    if (!finished) inputBox.onclick = showXChoices;
+    return;
+  }
+  area.innerHTML = "";
+  inputBox.style.opacity = "0.5"; inputBox.style.cursor = "default"; inputBox.onclick = null;
   
   addXBubble("them", t.tw_1, false);
   setTimeout(() => {
@@ -256,7 +275,12 @@ function startXChat() {
   }, 2000);
 }
 
-function addXBubble(from, text, showChoices) {
+function addXBubble(from, text, showChoices, save = true) {
+  if (save) {
+    const history = JSON.parse(localStorage.getItem("xChatHistory") || "[]");
+    history.push({ from, text });
+    localStorage.setItem("xChatHistory", JSON.stringify(history));
+  }
   let lang = localStorage.getItem('sysLang') || 'zh-CN';
   const t = window.trans[lang] || window.trans['zh-CN'];
   const area = document.getElementById("xChatArea");

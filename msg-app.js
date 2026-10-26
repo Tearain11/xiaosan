@@ -182,34 +182,24 @@ function openMsgChat() {
 function closeMsgChat() { document.getElementById("chatRoom").style.display = "none"; }
 
 function showBaekOpeningNotice() {
+  // 不把整段剧情塞进锁屏通知，只在信息列表中出现边伯贤联系人。
   const item = document.getElementById("baekItem");
   const preview = document.getElementById("baekPreview");
   if (item) item.style.display = "flex";
   if (preview) preview.textContent = "所以，姐姐有空嘛？";
-  if (localStorage.getItem("baekOpeningNoticeShown") === "true") return;
-  const phone = document.getElementById("phone");
-  if (!phone || document.getElementById("baek-opening-banner")) return;
-  const banner = document.createElement("div");
-  banner.id = "baek-opening-banner";
-  banner.style.cssText = "position:absolute; top:40px; left:16px; right:16px; background:rgba(50,50,50,0.72); backdrop-filter:blur(25px); border-radius:20px; padding:14px 16px; display:flex; gap:12px; transform:translateY(-150%); opacity:0; transition:all 0.4s; z-index:10001; border:1px solid rgba(255,255,255,0.1); box-shadow:0 10px 30px rgba(0,0,0,0.5); pointer-events:none;";
-  banner.innerHTML = '<img src="kyoong.jpg" style="width:42px;height:42px;border-radius:8px;object-fit:cover;"><div style="flex:1;text-align:left;"><div style="font-size:14px;font-weight:600;color:#fff;display:flex;justify-content:space-between;"><span>边伯贤</span><span style="font-size:12px;color:#aaa;">现在</span></div><div style="font-size:14px;color:#eee;margin-top:4px;line-height:1.3;">所以，姐姐有空嘛？</div></div>';
-  phone.appendChild(banner);
-  setTimeout(() => {
-    banner.style.transform = "translateY(0)";
-    banner.style.opacity = "1";
-    localStorage.setItem("baekOpeningNoticeShown", "true");
-    const dot = document.getElementById("app-msg-dot"); if (dot) dot.style.display = "block";
-  }, 150);
-  setTimeout(() => { banner.style.transform = "translateY(-150%)"; banner.style.opacity = "0"; }, 5200);
+  const dot = document.getElementById("app-msg-dot");
+  if (dot) dot.style.display = "block";
 }
+
 function openBaekChat() {
   const room = document.getElementById("baekRoom");
   if (room) room.style.display = "flex";
-  const banner = document.getElementById("baek-opening-banner");
-  if (banner) banner.style.opacity = "0";
   const dot = document.getElementById("app-msg-dot"); if (dot) dot.style.display = "none";
   const area = document.getElementById("baekArea");
-  if (area && area.innerHTML.trim() === "") addBaekBubble("them", "所以，姐姐有空嘛？");
+  if (area && area.innerHTML.trim() === "") {
+    const lines = ["所以，姐姐有空嘛？", "我刚刚看见姐姐在线了。", "本来想直接打电话的，又怕姐姐不方便。", "那我等姐姐回我，好不好？"];
+    lines.forEach((line, i) => setTimeout(() => addBaekBubble("them", line), i * 1600));
+  }
 }
 function closeBaekChat() { document.getElementById("baekRoom").style.display = "none"; }
 function addBaekBubble(from, text) {

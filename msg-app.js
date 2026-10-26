@@ -376,13 +376,11 @@ function showDayTwoInvite() {
   });
 }
 function showKyoongEnding() {
-  // 任意路线抵达结局时，标记当天剧情完成；不向日历泄露具体结局内容。
+  // 结局台词已经在信息 App 的聊天气泡中逐条显示；这里仅结束第一天并触发原有的进入第二天提示。
   localStorage.setItem("dayOneFinished", "true");
-  let ending = document.getElementById('kyoong-ending-screen');
-  if (!ending) {
-    ending = document.createElement('div'); ending.id = 'kyoong-ending-screen';
-    ending.style.cssText = 'position:absolute;inset:0;z-index:100000;background:#111;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;box-sizing:border-box;';
-    ending.innerHTML = '<div style="font-size:12px;letter-spacing:4px;color:#b9b9b9;margin-bottom:14px;">ENDING 01</div><div style="font-size:30px;font-weight:700;margin-bottom:24px;">到此为止</div><div style="font-size:15px;line-height:2;text-align:left;max-width:340px;">有些错误，在发生之后才终于显露出它的重量。<br><br>你选择停在这里，不再让一时的冲动成为继续伤害别人的理由。</div><div style="font-size:12px;color:#b9b9b9;margin-top:28px;">本次故事已结束</div><button id="kyoong-ending-return" style="margin-top:36px;padding:11px 24px;border:1px solid #777;border-radius:22px;background:transparent;color:#fff;font-size:14px;">返回手机</button>';
-    document.getElementById('phone').appendChild(ending); document.getElementById('kyoong-ending-return').onclick = () => { ending.remove(); closeKyoongChat(); };
-  } else ending.style.display = 'flex';
+  kyoongStep = 0;
+  closeKyoongChat();
+  setTimeout(() => {
+    if (typeof maybeShowDayTransition === "function") maybeShowDayTransition();
+  }, 300);
 }

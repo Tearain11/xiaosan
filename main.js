@@ -1,5 +1,4 @@
-// 👇 最暴力的默认语言强制重置（必须放在所有代码的最前面）
-localStorage.setItem('sysLang', 'zh-CN');
+// 使用玩家上次选择的界面语言；首次进入时再回退到默认中文。
 
 const CONFIG = { wallpaper: "wallpaper.jpg", passcode: "0506" };
 const $ = id => document.getElementById(id);

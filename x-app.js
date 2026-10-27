@@ -23,7 +23,7 @@ function initXApp() {
                 <span style="font-weight:bold; color:#fff; cursor:pointer;" onclick="switchXTab('baek')">${t.tw_baek}</span>
                 <span style="color:#71767b;">@baekhyun · ${t.tw_just_now}</span>
               </div>
-              <div style="margin-top:5px; font-size:15px;">${t.tw_tweet_text}</div>
+              <div style="margin-top:5px; font-size:15px;">${localStorage.getItem('gameDay') === '3' ? '新角度怎么样？' : t.tw_tweet_text}</div>
               <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
                 <img src="tweet.jpg" style="width:100%; display:block;">
               </div>
@@ -209,7 +209,7 @@ function uploadUserImg(input, imgId, placeholderId) {
 
 function triggerLike(element, originalCount, isMainTweet) {
   if (element.classList.contains("liked")) return;
-  if (localStorage.getItem("gameDay") === "3" && typeof window.day3AfterLike === "function") window.day3AfterLike();
+  if (localStorage.getItem("gameDay") === "3" && typeof window.day3AfterLike === "function") { window.day3AfterLike(); return; }
   element.classList.add("liked"); element.innerHTML = `❤️ ${originalCount}`; element.style.color = "#f91880";
   
   if (isMainTweet && !window.hasLiked) {

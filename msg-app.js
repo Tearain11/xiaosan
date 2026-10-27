@@ -352,7 +352,7 @@ function showDayTwoBaekNotification() {
 function renderDayTwoBoyfriendChoices() {
   if (localStorage.getItem('dayTwoBaekNoticeSent') !== 'true' || localStorage.getItem('dayTwoInviteChoice')) return;
   const opts = document.getElementById('msgOptions'); if (!opts) return; opts.style.display = 'flex'; opts.innerHTML = '';
-  [['好吧，那你下午来接我。', true], ['今天就算了，我还有别的安排。', false]].forEach(([label, yes]) => {
+  [['好吧，那你下午来接我。', true], ['今天不行，我还有别的安排。', false]].forEach(([label, yes]) => {
     const btn = document.createElement('button'); btn.textContent = label;
     btn.style.cssText = 'padding:12px;border-radius:12px;border:1px solid #007aff;background:#fff;color:#007aff;font-size:14px;text-align:left;line-height:1.45;';
     btn.onclick = () => finishDayTwoInvite('boyfriend', yes); opts.appendChild(btn);
@@ -371,16 +371,59 @@ function renderDayTwoBaekChoices() {
 
 function finishDayTwoInvite(chosenPerson, agrees) {
   if (localStorage.getItem('dayTwoInviteChoice')) return;
+
   const boyfriendAgrees = chosenPerson === 'boyfriend' ? agrees : !agrees;
   const baekAgrees = chosenPerson === 'baek' ? agrees : !agrees;
-  const boyfriendArea = document.getElementById('chatArea'), baekArea = document.getElementById('kyoongArea');
-  ['msgOptions','kyoongOptions'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-  if (boyfriendArea && !boyfriendArea.dataset.dayTwoReplyAdded) { boyfriendArea.dataset.dayTwoReplyAdded = 'true'; addMsgBubble('me', boyfriendAgrees ? '好吧，那你下午来接我。' : '今天就算了，我还有别的安排。'); }
-  if (baekArea && !baekArea.dataset.dayTwoReplyAdded) { baekArea.dataset.dayTwoReplyAdded = 'true'; addKyoongBubble('me', baekAgrees ? '好呀，那待会儿见。' : '今天不行，下次再说吧。'); }
+  const boyfriendArea = document.getElementById('chatArea');
+  const baekArea = document.getElementById('kyoongArea');
+  ['msgOptions','kyoongOptions'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+  });
+
+  // 先锁定选择，防止玩家在另一聊天框重复选择或同时答应两人。
   localStorage.setItem('dayTwoInviteChoice', boyfriendAgrees ? 'boyfriend-yes' : 'baek-yes');
-  localStorage.setItem('dayTwoFinished', 'true'); localStorage.setItem('dayTwoInviteSequenceFinished', 'true'); localStorage.setItem('dayTwoInviteStage', 'finished');
-  kyoongStep = 0; msgStep = 0; saveStoryProgressNow();
+  localStorage.setItem('dayTwoInviteStage', 'branch-replies');
+  kyoongStep = 0; msgStep = 0;
+
+  const boyfriendReply = boyfriendAgrees
+    ? ['好！','那我早点过去接你。','餐厅我已经订好了，你之前收藏的那家，我记得的。','逛街也不许再说什么都不缺了，喜欢就买。','这次好好陪你一下午。','宝宝，等我。']
+    : ['啊？今天不行吗？','好吧，那你先忙。','本来还想好好陪陪你的……','那你有空了记得告诉我，别又忙到忘记吃饭。'];
+  const baekReply = baekAgrees
+    ? ['真的？！','那我现在就去准备。姐姐你慢慢来，不用着急，一会我来接你。','今天下午的时间真的属于我了，对吧？','姐姐不准临时反悔！！等我电话再下楼哦！','我出门啦，待会见姐姐。']
+    : ['……好吧。','姐姐有安排的话，那我就不打扰你了。','本来还挺期待今天下午的。','没关系，下次也可以，我会等的，姐姐。','等多久都可以。'];
+
+  const boyfriendChoice = boyfriendAgrees ? '好吧，那你下午来接我。' : '今天不行，我还有别的安排。';
+  const baekChoice = baekAgrees ? '好呀，那待会儿见。' : '今天不行，下次再说吧。';
+
+  // 每条消息都在对应联系人聊天框中逐条出现，不使用整段剧情通知。
+  const addReplySequence = (area, addBubble, playerLine, replies, done) => {
+    if (!area) { done(); return; }
+    if (!area.dataset.dayTwoReplyAdded) {
+      area.dataset.dayTwoReplyAdded = 'true';
+      addBubble('me', playerLine);
+    }
+    let index = 0;
+    const next = () => {
+      if (index >= replies.length) { done(); return; }
+      addBubble('them', replies[index++]);
+      setTimeout(next, 850);
+    };
+    setTimeout(next, 700);
+  };
+
+  addReplySequence(baekArea, addKyoongBubble, baekChoice, baekReply, () => {
+    addReplySequence(boyfriendArea, addMsgBubble, boyfriendChoice, boyfriendReply, () => {
+      localStorage.setItem('dayTwoFinished', 'true');
+      localStorage.setItem('day2Finished', 'true');
+      localStorage.setItem('dayTwoInviteSequenceFinished', 'true');
+      localStorage.setItem('dayTwoInviteStage', 'finished');
+      saveStoryProgressNow();
+    });
+  });
+  saveStoryProgressNow();
 }
+
 function showKyoongEnding() {
   // 结局一：到此为止。保留独立结局画面，并提供重新开始选项。
   localStorage.setItem("dayOneFinished", "true");

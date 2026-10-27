@@ -209,6 +209,7 @@ function uploadUserImg(input, imgId, placeholderId) {
 
 function triggerLike(element, originalCount, isMainTweet) {
   if (element.classList.contains("liked")) return;
+  if (localStorage.getItem("gameDay") === "3" && typeof window.day3AfterLike === "function") window.day3AfterLike();
   element.classList.add("liked"); element.innerHTML = `❤️ ${originalCount}`; element.style.color = "#f91880";
   
   if (isMainTweet && !window.hasLiked) {

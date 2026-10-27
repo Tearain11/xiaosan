@@ -19,6 +19,7 @@ function begin(){
  a.innerHTML='';
  add(a,'them','宝宝，今天临时有点事，晚上不能陪你了。');
  add(a,'them','本来答应你的，抱歉。');
+ choices(a,[['去找边伯贤聊天',appointment]]);
  localStorage.setItem('day3StoryState',JSON.stringify(s));
 }
 function resume(s){

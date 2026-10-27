@@ -151,6 +151,7 @@ function openMsgChat() {
   const banner = document.getElementById('lock-msg-banner'); if (banner) banner.style.opacity = '0';
   const dot = document.getElementById('app-msg-dot'); if (dot) dot.style.display = 'none';
   const area = document.getElementById('chatArea');
+  document.querySelectorAll('#chatArea .msg-status').forEach(el => { el.textContent = '已读'; el.style.color = '#8e8e93'; });
   // 只有玩家主动点进男朋友聊天框，才把第二天的七条完整邀约放进聊天记录。
   if (localStorage.getItem('dayTwoBoyfriendNoticeSent') === 'true' && localStorage.getItem('dayTwoBoyfriendChatOpened') !== 'true') {
     localStorage.setItem('dayTwoBoyfriendChatOpened', 'true'); area.innerHTML = '';

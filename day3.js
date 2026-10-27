@@ -91,8 +91,8 @@ function finishB(){
 function showTweetNotice(){
  let s=read();s.stage='tweet';write(s);
  const old=$('day3-notice');if(old)return;
- const n=document.createElement('div');n.id='day3-notice';n.style.cssText='position:fixed;z-index:99997;top:28px;left:12px;right:12px;background:#f8f8f8;color:#111;border-radius:18px;padding:14px;box-shadow:0 5px 25px #0003;font:14px sans-serif;cursor:pointer';
- n.innerHTML='<b>𝕏　Baek.</b><div style="margin-top:5px">新推文：新角度怎么样？</div><small>点击打开 X 并点赞</small>';
+ const n=document.createElement('div');n.id='day3-notice';n.style.cssText='position:fixed;z-index:99997;top:calc(env(safe-area-inset-top, 0px) + 12px);left:14px;right:14px;display:flex;align-items:center;gap:11px;background:rgba(42,42,42,.96);color:#fff;border-radius:20px;padding:13px 15px;box-shadow:0 8px 28px #0005;font:14px -apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer;backdrop-filter:blur(18px);';
+ n.innerHTML='<img src="avatar.jpg" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0"><div style="min-width:0;flex:1"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px"><b style="font-size:14px">Baek.</b><span style="font-size:11px;color:#bbb">现在</span></div><div style="font-size:13px;color:#f3f3f3">发布了新推文</div><div style="font-size:12px;color:#bbb;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">新角度怎么样？</div></div>';
  n.onclick=()=>{n.remove();if(typeof openApp==='function')openApp('x');};document.body.appendChild(n);
 }
 function afterLike(){

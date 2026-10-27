@@ -188,18 +188,46 @@ function getGameDay() {
 }
 
 function maybeShowDayTransition() {
-  if (getGameDay() !== 1 || localStorage.getItem("dayOneFinished") !== "true") return;
+  const day = getGameDay();
+  const ready = (day === 1 && localStorage.getItem("dayOneFinished") === "true")
+    || (day === 2 && localStorage.getItem("dayTwoFinished") === "true");
+  if (!ready) return;
   const modal = document.getElementById("day-transition");
-  if (modal) modal.classList.add("show");
+  if (!modal) return;
+  const title = modal.querySelector(".day-transition-title");
+  const description = modal.querySelector(".day-transition-description");
+  const button = modal.querySelector(".day-transition-button");
+  const kicker = modal.querySelector(".day-transition-kicker");
+  const footnote = modal.querySelector(".day-transition-footnote");
+  if (day === 2) {
+    if (title) title.textContent = "第二天结束";
+    if (description) description.textContent = "今天的邀约已经有了答案。明天，还有新的故事等待你。";
+    if (button) button.textContent = "进入第三天";
+    if (kicker) kicker.textContent = "DAY TWO COMPLETE";
+    if (footnote) footnote.textContent = "点击继续 · 剧情将从第三天开始";
+  } else {
+    if (title) title.textContent = "新的一天";
+    if (description) description.textContent = "昨夜的故事已经结束。今天，还有新的消息等待你。";
+    if (button) button.textContent = "进入第二天";
+    if (kicker) kicker.textContent = "STORY CONTINUES";
+    if (footnote) footnote.textContent = "点击继续 · 剧情将从今天开始";
+  }
+  modal.classList.add("show");
 }
 
 function enterNextDay() {
-  if (localStorage.getItem("dayOneFinished") !== "true") return;
-  localStorage.setItem("gameDay", "2");
-  localStorage.setItem("dayOnePromptShown", "true");
+  const day = getGameDay();
   const modal = document.getElementById("day-transition");
-  if (modal) modal.classList.remove("show");
-  if (typeof triggerKyoongSMS === "function") triggerKyoongSMS();
+  if (day === 1 && localStorage.getItem("dayOneFinished") === "true") {
+    localStorage.setItem("gameDay", "2");
+    localStorage.setItem("dayOnePromptShown", "true");
+    if (modal) modal.classList.remove("show");
+    if (typeof triggerKyoongSMS === "function") triggerKyoongSMS();
+  } else if (day === 2 && localStorage.getItem("dayTwoFinished") === "true") {
+    localStorage.setItem("gameDay", "3");
+    localStorage.setItem("dayTwoPromptShown", "true");
+    if (modal) modal.classList.remove("show");
+  }
 }
 
 let calendarViewDate = new Date();

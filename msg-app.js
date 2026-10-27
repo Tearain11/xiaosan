@@ -412,15 +412,22 @@ function finishDayTwoInvite(chosenPerson, agrees) {
     setTimeout(next, 700);
   };
 
-  addReplySequence(baekArea, addKyoongBubble, baekChoice, baekReply, () => {
-    addReplySequence(boyfriendArea, addMsgBubble, boyfriendChoice, boyfriendReply, () => {
-      localStorage.setItem('dayTwoFinished', 'true');
-      localStorage.setItem('day2Finished', 'true');
-      localStorage.setItem('dayTwoInviteSequenceFinished', 'true');
-      localStorage.setItem('dayTwoInviteStage', 'finished');
-      saveStoryProgressNow();
+  const completeDayTwo = () => {
+    localStorage.setItem('dayTwoFinished', 'true');
+    localStorage.setItem('day2Finished', 'true');
+    localStorage.setItem('dayTwoInviteSequenceFinished', 'true');
+    localStorage.setItem('dayTwoInviteStage', 'finished');
+    saveStoryProgressNow();
+  };
+  if (chosenPerson === 'baek') {
+    addReplySequence(baekArea, addKyoongBubble, baekChoice, baekReply, () => {
+      addReplySequence(boyfriendArea, addMsgBubble, boyfriendChoice, boyfriendReply, completeDayTwo);
     });
-  });
+  } else {
+    addReplySequence(boyfriendArea, addMsgBubble, boyfriendChoice, boyfriendReply, () => {
+      addReplySequence(baekArea, addKyoongBubble, baekChoice, baekReply, completeDayTwo);
+    });
+  }
   saveStoryProgressNow();
 }
 

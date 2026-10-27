@@ -227,6 +227,7 @@ function enterNextDay() {
     localStorage.setItem("gameDay", "3");
     localStorage.setItem("dayTwoPromptShown", "true");
     if (modal) modal.classList.remove("show");
+    if (typeof window.initDay3Story === "function") window.initDay3Story();
   }
 }
 

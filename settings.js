@@ -122,10 +122,9 @@ function toggleLangList() {
 }
 
 function selectLanguage(langCode) {
+  // 语言切换后重新构建所有 App，避免已经打开过的页面继续保留旧语言的 DOM。
   localStorage.setItem('sysLang', langCode);
-  document.getElementById('settingsAppContent').innerHTML = "";
-  initSettingsApp();
-  if(typeof updateGlobalLanguage === "function") updateGlobalLanguage();
+  location.reload();
 }
 
 function lockPhone() {

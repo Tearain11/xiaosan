@@ -1,6 +1,6 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
-  if (container.innerHTML.trim() !== "") { syncDay3PostVisibility(); return; }
+  if (container.innerHTML.trim() !== '') { if (typeof window.syncDay3PostVisibility === 'function') window.syncDay3PostVisibility(); return; }
 
   // 剧情进度只在网页完整加载时重置；切换到 X App 时不清理游戏状态。
 
@@ -38,9 +38,6 @@ function initXApp() {
           </div>
         </div>
 
-      </div>
-    </div>
-
         <div style="border-bottom:1px solid #2f3336;padding:15px;">
           <div style="display:flex;gap:10px;">
             <img src="avatar.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
@@ -52,6 +49,10 @@ function initXApp() {
             </div>
           </div>
         </div>
+
+      </div>
+    </div>
+
     <div id="x-tab-notify" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column;">
       <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; border-bottom:1px solid #2f3336;">${t.tw_notify}</div>
       <div id="notify-content" style="flex:1; overflow-y:auto; padding-bottom:60px;"></div>
@@ -204,13 +205,14 @@ function initXApp() {
     </div>
   `;
 
-  function syncDay3PostVisibility() {
+  window.syncDay3PostVisibility = function syncDay3PostVisibility() {
     let s = {};
     try { s = JSON.parse(localStorage.getItem('day3StoryState') || '{}'); } catch(e) {}
     const visible = localStorage.getItem('gameDay') === '3' && ['tweet','after','done'].includes(s.stage);
     ['day3-home-post','day3-profile-post'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = visible ? 'block' : 'none'; });
-  }
-  setTimeout(syncDay3PostVisibility, 0);
+  };
+
+  setTimeout(window.syncDay3PostVisibility, 0);
 }
 
 function switchXTab(tabId) {

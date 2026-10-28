@@ -41,6 +41,17 @@ function initXApp() {
       </div>
     </div>
 
+        <div style="border-bottom:1px solid #2f3336;padding:15px;">
+          <div style="display:flex;gap:10px;">
+            <img src="avatar.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+            <div style="flex:1;">
+              <div style="font-size:15px;color:#fff;"><b>${t.tw_baek}</b> <span style="color:#71767b;">@baekhyun · ${t.tw_just_now}</span></div>
+              <div style="margin-top:5px;font-size:15px;color:#fff;">${t.tw_tweet_text}</div>
+              <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid #333;"><img src="tweet.jpg" style="width:100%;display:block;"></div>
+              <div style="display:flex;justify-content:space-between;margin-top:12px;color:#71767b;font-size:13px;"><span>💬 3.46万</span><span>🔁 2.35万</span><span id="like-btn-home-original" style="cursor:pointer;" onclick="triggerLike(this, '8.65万', true)">🤍 8.65万</span><span>📊 18.3万</span></div>
+            </div>
+          </div>
+        </div>
     <div id="x-tab-notify" style="display:none; position:absolute; inset:0; background:#000; flex-direction:column;">
       <div style="padding-top:44px; height:84px; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; border-bottom:1px solid #2f3336;">${t.tw_notify}</div>
       <div id="notify-content" style="flex:1; overflow-y:auto; padding-bottom:60px;"></div>

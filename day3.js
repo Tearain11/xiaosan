@@ -18,9 +18,12 @@ function notifyBoyfriend(message,callback){
  setTimeout(()=>{if(n.isConnected){n.style.transition='opacity .4s';n.style.opacity='0';setTimeout(()=>n.remove(),450);}},9000);
 }
 function begin(){
- let s=read();if(s.done||localStorage.getItem('gameDay')!=='3')return;
+ if(localStorage.getItem('gameDay')!=='3')return;
+ let s=read();
+ if(s.version!==2){s={version:2,started:false,stage:'bf-cancel',route:'',done:false};write(s);}
+ if(s.done)return;
  if(s.started){resume(s);return;}
- s={started:true,stage:'bf-cancel',route:'',done:false};write(s);
+ s.version=2;s.started=true;s.stage='bf-cancel';s.route='';write(s);
  notifyBoyfriend('宝宝，今天临时有事，晚上不能陪你了。',a=>{
    if(!a)return;a.innerHTML='';
    add(a,'them','宝宝，今天临时有点事，晚上不能陪你了。');
@@ -40,6 +43,7 @@ function resume(s){
  else if(s.stage==='after')afterLike();
 }
 function replyOkay(){
+ localStorage.setItem('dayTwoInviteSequenceStarted','true');
  let s=read();s.stage='baek-ask';write(s);const a=openBoyfriend();add(a,'me','好吧');clearOptions();
  setTimeout(()=>{const b=openBaek();if(!b)return;options(b,[['今晚有空吗？',askBaek]]);},450);
 }

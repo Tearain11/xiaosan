@@ -153,17 +153,21 @@ function lockPhone() {
 
 function clearMemory(confirmText) {
   if (!confirm(confirmText)) return;
-  // 清除前先阻止旧页面在 reload/pagehide 时把旧剧情重新写回自动存档。
+  // 禁止旧页面卸载时自动保存，避免清除后又把旧剧情写回来。
   if (typeof skipAutoSaveOnUnload !== "undefined") skipAutoSaveOnUnload = true;
   try {
-    localStorage.clear();
-    sessionStorage.removeItem("gameLoadReturnHome");
+    // 明确清除所有游戏存档、自动存档及其备份。
+    for (const key of Object.keys(localStorage)) localStorage.removeItem(key);
+    sessionStorage.clear();
   } catch (error) {
     console.warn("清除存档失败", error);
-    alert("清除失败，请再试一次。");
+    alert("清除失败，请检查浏览器是否允许此网站使用本地存储。");
     return;
   }
-  location.reload();
+  // 带一次性参数重新加载，避免旧页面缓存继续显示上一轮剧情。
+  const url = new URL(location.href);
+  url.searchParams.set("reset", String(Date.now()));
+  location.replace(url.toString());
 }
 
 function uploadSettingsImg(input) {

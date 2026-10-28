@@ -154,9 +154,14 @@ function clearMemory(confirmText) {
   if (!confirm(confirmText)) return;
   // 禁止旧页面卸载时自动保存，避免清除后又把旧剧情写回来。
   if (typeof skipAutoSaveOnUnload !== "undefined") skipAutoSaveOnUnload = true;
+  // 聊天页面有独立的 500ms 进度保存计时器，必须先停掉，否则清除后旧 DOM 会把对话重新写回。
+  if (window.storyProgressSaveTimer) {
+    clearInterval(window.storyProgressSaveTimer);
+    window.storyProgressSaveTimer = null;
+  }
   try {
     // 明确清除所有游戏存档、自动存档及其备份。
-    for (const key of Object.keys(localStorage)) localStorage.removeItem(key);
+    while (localStorage.length) localStorage.removeItem(localStorage.key(0));
     sessionStorage.clear();
   } catch (error) {
     console.warn("清除存档失败", error);

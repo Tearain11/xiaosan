@@ -95,6 +95,8 @@ function initMsgApp() {
   if (savedKyoongStep !== null) kyoongStep = parseInt(savedKyoongStep, 10) || 0;
   if (!window.storyProgressSaveTimer) {
     window.storyProgressSaveTimer = setInterval(() => {
+      // 清空记忆/重置页面期间禁止旧聊天室 DOM 再次写回旧剧情。
+      if (window.skipStoryProgressSave) return;
       const boyfriendArea = document.getElementById('chatArea');
       const baekArea = document.getElementById('kyoongArea');
       if (boyfriendArea) localStorage.setItem('storyChat_boyfriend', boyfriendArea.innerHTML);

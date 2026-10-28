@@ -216,14 +216,18 @@ function initXApp() {
 }
 
 function switchXTab(tabId) {
-  document.getElementById('x-tab-home').style.display = 'none';
-  document.getElementById('x-tab-notify').style.display = 'none';
-  document.getElementById('x-tab-msg').style.display = 'none';
-  document.getElementById('x-tab-baek').style.display = 'none';
-  document.getElementById('x-tab-profile').style.display = 'none';
-  
+  // 确保 X 页面已初始化，并将所有标签页统一隐藏后再显示目标页面。
+  const container = document.getElementById('xAppContent');
+  if (container && !container.innerHTML.trim()) initXApp();
+  ['home','notify','msg','baek','profile'].forEach(id => {
+    const page = document.getElementById('x-tab-' + id);
+    if (page) page.style.display = 'none';
+  });
   const target = document.getElementById('x-tab-' + tabId);
-  if(target) target.style.display = 'flex';
+  if(target) {
+    target.style.display = 'flex';
+    target.scrollTop = 0;
+  }
 
   document.querySelectorAll('svg[id^="nav-"]').forEach(el => el.style.fill = '#71767b');
   if(tabId === 'baek') document.getElementById('nav-home').style.fill = '#fff';

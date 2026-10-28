@@ -296,6 +296,7 @@ document.addEventListener("click", e => { if(e.target.closest("[data-home]")) go
 
 const GAME_SAVE_PREFIX = "gameSaveSlot_";
 const GAME_AUTO_SAVE_KEY = "gameAutoSave";
+const GAME_AUTO_BACKUP_KEY = "gameAutoSaveBackup";
 const SETTINGS_KEYS = new Set(["sysLang", "userName", "userAvatar", "userBg"]);
 function getGameSnapshot() {
   // 保存瞬间直接读取当前 DOM 和剧情变量，不再依赖 500ms 定时器是否刚好运行。
@@ -329,14 +330,16 @@ let skipAutoSaveOnUnload = false;
 function saveGameAuto() {
   // 读档刷新时，旧页面的 pagehide/visibilitychange 不能再把当前较新的进度写回自动存档。
   if (skipAutoSaveOnUnload) return;
-  try { localStorage.setItem(GAME_AUTO_SAVE_KEY, JSON.stringify({ savedAt: Date.now(), data: getGameSnapshot() })); }
+  try { const record = JSON.stringify({ savedAt: Date.now(), data: getGameSnapshot() }); localStorage.setItem(GAME_AUTO_SAVE_KEY, record); localStorage.setItem(GAME_AUTO_BACKUP_KEY, record); }
   catch (error) { console.warn("自动存档失败", error); }
 }
 function restoreGameAuto() {
   try {
-    const raw = localStorage.getItem(GAME_AUTO_SAVE_KEY);
+    let raw = localStorage.getItem(GAME_AUTO_SAVE_KEY);
+    if (!raw) raw = localStorage.getItem(GAME_AUTO_BACKUP_KEY);
     if (!raw) return;
     const save = JSON.parse(raw);
+    if (!localStorage.getItem(GAME_AUTO_SAVE_KEY)) localStorage.setItem(GAME_AUTO_SAVE_KEY, raw);
     if (save && save.data) applyGameSnapshot(save.data);
   } catch (error) { console.warn("自动存档读取失败", error); }
 }
@@ -359,10 +362,9 @@ function loadGameSlot(slot) {
     // 读档时不能调用 saveGameAuto()：它会从当前旧页面 DOM 重新抓取较新的聊天内容，
     // 覆盖刚读入的旧存档。必须把选中的存档数据原样写入自动存档，再刷新页面。
     // 先用手动存档覆盖自动存档，避免旧页面的定时保存把新剧情带回来。
-    localStorage.setItem(GAME_AUTO_SAVE_KEY, JSON.stringify({
-      savedAt: Date.now(),
-      data: record.data
-    }));
+    const restored = JSON.stringify({ savedAt: Date.now(), data: record.data });
+    localStorage.setItem(GAME_AUTO_SAVE_KEY, restored);
+    localStorage.setItem(GAME_AUTO_BACKUP_KEY, restored);
     applyGameSnapshot(record.data);
     // 让刷新后的页面直接进入已解锁的主屏幕。
     sessionStorage.setItem("gameLoadReturnHome", "true");

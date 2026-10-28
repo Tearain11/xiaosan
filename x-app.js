@@ -14,8 +14,8 @@ function initXApp() {
       </div>
       <div style="flex:1; overflow-y:auto; padding-bottom:60px;">
         
-        <!-- 刚刚发布的推文 -->
-        <div style="border-bottom:1px solid #2f3336; padding:15px;">
+        <!-- 第三天新推文：剧情到达推文阶段后才显示 -->
+        <div id="day3-home-post" style="display:none;border-bottom:1px solid #2f3336; padding:15px;">
           <div style="display:flex; gap:10px;">
             <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover; cursor:pointer;" onclick="switchXTab('baek')">
             <div style="flex:1;">
@@ -23,9 +23,9 @@ function initXApp() {
                 <span style="font-weight:bold; color:#fff; cursor:pointer;" onclick="switchXTab('baek')">${t.tw_baek}</span>
                 <span style="color:#71767b;">@baekhyun · ${t.tw_just_now}</span>
               </div>
-              <div style="margin-top:5px; font-size:15px;" data-baek-tweet-caption>新角度怎么样？</div>
+              <div style="margin-top:5px; font-size:15px;">${t.tw_tweet_text}</div>
               <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
-                <img src="tweet.jpg" style="width:100%; display:block;">
+                <img src="day3-tweet.jpg" style="width:100%; display:block;">
               </div>
               <div style="display:flex; justify-content:space-between; margin-top:12px; color:#71767b; font-size:13px; padding-right:15px;">
                 <span style="cursor:pointer;">💬 3.46万</span>
@@ -71,13 +71,13 @@ function initXApp() {
       </div>
 
       <!-- DAY3_NEW_POST -->
-      <div style="border-bottom:1px solid #2f3336;padding:15px;">
+      <div id="day3-profile-post" style="display:none;border-bottom:1px solid #2f3336;padding:15px;">
         <div style="display:flex;gap:10px;">
           <img src="avatar.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
           <div style="flex:1;">
             <div style="font-size:15px;color:#fff;"><b>${t.tw_baek}</b> <span style="color:#71767b;">@baekhyun · 刚刚</span></div>
             <div style="margin-top:5px;font-size:15px;color:#fff;">新角度怎么样？</div>
-            <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid #333;"><img src="tweet.jpg" style="width:100%;display:block;"></div>
+            <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid #333;"><img src="day3-tweet.jpg" style="width:100%;display:block;"></div>
             <div style="display:flex;justify-content:space-between;margin-top:12px;color:#71767b;font-size:13px;padding-right:8px;">
               <span>💬 1,284</span><span>🔁 3,672</span>
               <span id="like-btn-day3-profile" style="cursor:pointer;" onclick="triggerLike(this, '2.8万', true)">🤍 2.8万</span>
@@ -192,6 +192,14 @@ function initXApp() {
       <div id="xChoices" style="display:none; flex-direction:column; gap:6px; padding:10px 16px 30px; background:#000;"></div>
     </div>
   `;
+
+  function syncDay3PostVisibility() {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem('day3StoryState') || '{}'); } catch(e) {}
+    const visible = localStorage.getItem('gameDay') === '3' && ['tweet','after','done'].includes(s.stage);
+    ['day3-home-post','day3-profile-post'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = visible ? 'block' : 'none'; });
+  }
+  setTimeout(syncDay3PostVisibility, 0);
 }
 
 function switchXTab(tabId) {

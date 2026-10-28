@@ -1,6 +1,6 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
-  if (container.innerHTML.trim() !== "") return;
+  if (container.innerHTML.trim() !== "") { syncDay3PostVisibility(); return; }
 
   // 剧情进度只在网页完整加载时重置；切换到 X App 时不清理游戏状态。
 
@@ -23,9 +23,9 @@ function initXApp() {
                 <span style="font-weight:bold; color:#fff; cursor:pointer;" onclick="switchXTab('baek')">${t.tw_baek}</span>
                 <span style="color:#71767b;">@baekhyun · ${t.tw_just_now}</span>
               </div>
-              <div style="margin-top:5px; font-size:15px;">${t.tw_tweet_text}</div>
+              <div style="margin-top:5px; font-size:15px;">新角度怎么样？</div>
               <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
-                <img src="day3-tweet.jpg" style="width:100%; display:block;">
+                <img src="day3-tweet.webp" style="width:100%; display:block;">
               </div>
               <div style="display:flex; justify-content:space-between; margin-top:12px; color:#71767b; font-size:13px; padding-right:15px;">
                 <span style="cursor:pointer;">💬 3.46万</span>
@@ -77,7 +77,7 @@ function initXApp() {
           <div style="flex:1;">
             <div style="font-size:15px;color:#fff;"><b>${t.tw_baek}</b> <span style="color:#71767b;">@baekhyun · 刚刚</span></div>
             <div style="margin-top:5px;font-size:15px;color:#fff;">新角度怎么样？</div>
-            <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid #333;"><img src="day3-tweet.jpg" style="width:100%;display:block;"></div>
+            <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid #333;"><img src="day3-tweet.webp" style="width:100%;display:block;"></div>
             <div style="display:flex;justify-content:space-between;margin-top:12px;color:#71767b;font-size:13px;padding-right:8px;">
               <span>💬 1,284</span><span>🔁 3,672</span>
               <span id="like-btn-day3-profile" style="cursor:pointer;" onclick="triggerLike(this, '2.8万', true)">🤍 2.8万</span>

@@ -309,7 +309,7 @@ function getGameSnapshot() {
   const snapshot = {};
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (!key || SETTINGS_KEYS.has(key) || key === GAME_AUTO_SAVE_KEY || key.startsWith(GAME_SAVE_PREFIX)) continue;
+    if (!key || SETTINGS_KEYS.has(key) || (key === GAME_AUTO_SAVE_KEY || key === GAME_AUTO_BACKUP_KEY) || key.startsWith(GAME_SAVE_PREFIX)) continue;
     snapshot[key] = localStorage.getItem(key);
   }
   return snapshot;
@@ -319,11 +319,11 @@ function applyGameSnapshot(snapshot) {
   const remove = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (key && !SETTINGS_KEYS.has(key) && key !== GAME_AUTO_SAVE_KEY && !key.startsWith(GAME_SAVE_PREFIX)) remove.push(key);
+    if (key && !SETTINGS_KEYS.has(key) && key !== GAME_AUTO_SAVE_KEY && key !== GAME_AUTO_BACKUP_KEY && !key.startsWith(GAME_SAVE_PREFIX)) remove.push(key);
   }
   remove.forEach(key => localStorage.removeItem(key));
   Object.entries(snapshot).forEach(([key, value]) => {
-    if (!SETTINGS_KEYS.has(key) && key !== GAME_AUTO_SAVE_KEY && !key.startsWith(GAME_SAVE_PREFIX)) localStorage.setItem(key, value);
+    if (!SETTINGS_KEYS.has(key) && key !== GAME_AUTO_SAVE_KEY && key !== GAME_AUTO_BACKUP_KEY && !key.startsWith(GAME_SAVE_PREFIX)) localStorage.setItem(key, value);
   });
 }
 let skipAutoSaveOnUnload = false;

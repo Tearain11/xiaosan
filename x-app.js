@@ -1,6 +1,6 @@
 function initXApp() {
   const container = document.getElementById("xAppContent");
-  if (container.innerHTML.trim() !== "") { if (localStorage.getItem("gameDay") === "3") container.querySelectorAll("[data-baek-tweet-caption]").forEach(el => el.textContent = "新角度怎么样？"); return; }
+  if (container.innerHTML.trim() !== "") return;
 
   // 剧情进度只在网页完整加载时重置；切换到 X App 时不清理游戏状态。
 
@@ -23,7 +23,7 @@ function initXApp() {
                 <span style="font-weight:bold; color:#fff; cursor:pointer;" onclick="switchXTab('baek')">${t.tw_baek}</span>
                 <span style="color:#71767b;">@baekhyun · ${t.tw_just_now}</span>
               </div>
-              <div style="margin-top:5px; font-size:15px;" data-baek-tweet-caption>${localStorage.getItem('gameDay') === '3' ? '新角度怎么样？' : t.tw_tweet_text}</div>
+              <div style="margin-top:5px; font-size:15px;" data-baek-tweet-caption>新角度怎么样？</div>
               <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
                 <img src="tweet.jpg" style="width:100%; display:block;">
               </div>
@@ -70,13 +70,30 @@ function initXApp() {
         </div>
       </div>
 
+      <!-- DAY3_NEW_POST -->
+      <div style="border-bottom:1px solid #2f3336;padding:15px;">
+        <div style="display:flex;gap:10px;">
+          <img src="avatar.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+          <div style="flex:1;">
+            <div style="font-size:15px;color:#fff;"><b>${t.tw_baek}</b> <span style="color:#71767b;">@baekhyun · 刚刚</span></div>
+            <div style="margin-top:5px;font-size:15px;color:#fff;">新角度怎么样？</div>
+            <div style="margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid #333;"><img src="tweet.jpg" style="width:100%;display:block;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:12px;color:#71767b;font-size:13px;padding-right:8px;">
+              <span>💬 1,284</span><span>🔁 3,672</span>
+              <span id="like-btn-day3-profile" style="cursor:pointer;" onclick="triggerLike(this, '2.8万', true)">🤍 2.8万</span>
+              <span>📊 21.6万</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 刚刚 (Sit down) -->
       <div style="border-bottom:1px solid #2f3336; padding:15px; margin-top:10px;">
         <div style="display:flex; gap:10px;">
           <img src="avatar.jpg" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
           <div style="flex:1;">
             <div style="font-size:15px; color:#fff;"><b>${t.tw_baek}</b> <span style="color:#71767b;">· ${t.tw_just_now}</span></div>
-            <div style="margin-top:5px; font-size:15px; color:#fff;" data-baek-tweet-caption>${localStorage.getItem("gameDay") === "3" ? "新角度怎么样？" : t.tw_tweet_text}</div>
+            <div style="margin-top:5px; font-size:15px; color:#fff;" data-baek-tweet-caption>${t.tw_tweet_text}</div>
             <div style="margin-top:10px; border-radius:16px; overflow:hidden; border:1px solid #333;">
               <img src="tweet.jpg" style="width:100%; display:block;">
             </div>
